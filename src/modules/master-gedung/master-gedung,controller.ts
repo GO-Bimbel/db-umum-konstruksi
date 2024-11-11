@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { BagianGedungDto } from 'src/dto/master-gedung-dto';
+import { BagianGedungDto, DetailGedungDto, KomponenGedungDto } from 'src/dto/master-gedung-dto';
 import { MasterGedungService } from './master-gedung.service';
 import { SUCCESS_STATUS } from 'src/dto/request-response.dto';
 
@@ -61,7 +61,7 @@ export class MasterGedungController {
     summary: 'Get Bagian Gedung Detail',
     description: 'Get Bagian Gedung detail using query params',
   })
-  async getDetail(@Query() params: BagianGedungDto) {
+  async getDetail(@Query() params: DetailGedungDto) {
     try {
       const { total_data, data } =
         await this.masterGedungService.getDetail(params);
@@ -97,7 +97,7 @@ export class MasterGedungController {
     summary: 'Get Bagian Gedung Komponen',
     description: 'Get Bagian Gedung komponen using query params',
   })
-  async getKomponen(@Query() params: BagianGedungDto) {
+  async getKomponen(@Query() params: KomponenGedungDto) {
     try {
       const { total_data, data } =
         await this.masterGedungService.getKomponen(params);

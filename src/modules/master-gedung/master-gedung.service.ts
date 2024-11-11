@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { ApiService } from 'src/api/api.service';
-import { BagianGedungDto } from 'src/dto/master-gedung-dto';
+import { BagianGedungDto, DetailGedungDto, KomponenGedungDto } from 'src/dto/master-gedung-dto';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -39,23 +39,24 @@ export class MasterGedungService {
     };
   }
 
-  async getDetail(params: BagianGedungDto) {
+  async getKomponen(params: KomponenGedungDto) {
     const skip = params.page ? (params.page - 1) * params.per_page : 0;
 
-    const where: Prisma.bagian_gedung_detailWhereInput = {
+    const where: Prisma.bagian_gedung_komponenWhereInput = {
       nama: {
         contains: params.keyword,
         mode: 'insensitive',
       },
+      id: params.bagian_gedung_id,
     };
 
     const [data, total_data] = await Promise.all([
-      this.prisma.bagian_gedung_detail.findMany({
+      this.prisma.bagian_gedung_komponen.findMany({
         where,
         skip: params.is_all_data ? undefined : skip,
         take: params.is_all_data ? undefined : params.per_page,
       }),
-      this.prisma.bagian_gedung_detail.count({
+      this.prisma.bagian_gedung_komponen.count({
         where,
       }),
     ]);
@@ -66,23 +67,24 @@ export class MasterGedungService {
     };
   }
 
-  async getKomponen(params: BagianGedungDto) {
+  async getDetail(params: DetailGedungDto) {
     const skip = params.page ? (params.page - 1) * params.per_page : 0;
 
-    const where: Prisma.bagian_gedung_komponenWhereInput = {
+    const where: Prisma.bagian_gedung_detailWhereInput = {
       nama: {
         contains: params.keyword,
         mode: 'insensitive',
       },
+      id: params.bagian_gedung_komponen_id,
     };
 
     const [data, total_data] = await Promise.all([
-      this.prisma.bagian_gedung_komponen.findMany({
+      this.prisma.bagian_gedung_detail.findMany({
         where,
         skip: params.is_all_data ? undefined : skip,
         take: params.is_all_data ? undefined : params.per_page,
       }),
-      this.prisma.bagian_gedung_komponen.count({
+      this.prisma.bagian_gedung_detail.count({
         where,
       }),
     ]);

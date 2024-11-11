@@ -57,7 +57,7 @@ export class PemeliharaanGedungService {
   }
 
   async updatePemeliharaanGedung(id: number, dto: UpdatePemeliharaanGedungDto) {
-    const result = this.prisma.pemeliharaan_gedung.update({
+    const result = await this.prisma.pemeliharaan_gedung.update({
       where: {
         id: id,
       },
