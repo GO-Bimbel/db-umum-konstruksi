@@ -12,7 +12,11 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SUCCESS_STATUS } from 'src/dto/request-response.dto';
 import { PemeliharaanGedungService } from './pemeliharaan-gedung.service';
-import { CreatePemeliharaanGedungDto, PemeliharaanGedungDto, UpdatePemeliharaanGedungDto } from 'src/dto/pemeliharaan-gedung.dto';
+import {
+  CreatePemeliharaanGedungDto,
+  PemeliharaanGedungDto,
+  UpdatePemeliharaanGedungDto,
+} from 'src/dto/pemeliharaan-gedung.dto';
 
 @Controller('pemeliharaan-gedung')
 @ApiTags('Master Gedung')
@@ -20,54 +24,6 @@ export class PemeliharaanGedungController {
   constructor(
     private readonly masterGedungService: PemeliharaanGedungService,
   ) {}
-  private moment = require('moment-timezone');
-  private locale = 'Asia/Jakarta';
-
-  @Patch(':id')
-  @ApiOperation({
-    summary: 'Update pemeliharaan gedung',
-    description:
-      'Update pemeliharaan gedung using param id_barang and payloads',
-  })
-  async update(@Param('id') id: string, @Body() dto: UpdatePemeliharaanGedungDto) {
-    try {
-      const data = await this.masterGedungService.updatePemeliharaanGedung(
-        Number(id),
-        dto,
-      );
-      return {
-        data: data,
-        _meta: {
-          code: HttpStatus.ACCEPTED,
-          status: SUCCESS_STATUS,
-          message: 'success update pemeliharaan gedung',
-        },
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Post()
-  @ApiOperation({
-    summary: 'Input pemeliharaan gedung',
-    description: 'Input pemeliharaan gedung ke Unit',
-  })
-  async createPemeliharaanGedung(@Body() dto: CreatePemeliharaanGedungDto) {
-    try {
-      const data = await this.masterGedungService.createPemeliharaanGedung(dto);
-      return {
-        data: data,
-        _meta: {
-          code: HttpStatus.CREATED,
-          status: SUCCESS_STATUS,
-          message: 'success post pemeliharaan gedung',
-        },
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
 
   @Get()
   @ApiOperation({
@@ -98,6 +54,55 @@ export class PemeliharaanGedungController {
           code: HttpStatus.OK,
           status: SUCCESS_STATUS,
           message: 'success get Pemeliharaan Gedung',
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post()
+  @ApiOperation({
+    summary: 'Input pemeliharaan gedung',
+    description: 'Input pemeliharaan gedung ke Unit',
+  })
+  async createPemeliharaanGedung(@Body() dto: CreatePemeliharaanGedungDto) {
+    try {
+      const data = await this.masterGedungService.createPemeliharaanGedung(dto);
+      return {
+        data: data,
+        _meta: {
+          code: HttpStatus.CREATED,
+          status: SUCCESS_STATUS,
+          message: 'success post pemeliharaan gedung',
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Patch(':id')
+  @ApiOperation({
+    summary: 'Update pemeliharaan gedung',
+    description:
+      'Update pemeliharaan gedung using param id_barang and payloads',
+  })
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdatePemeliharaanGedungDto,
+  ) {
+    try {
+      const data = await this.masterGedungService.updatePemeliharaanGedung(
+        Number(id),
+        dto,
+      );
+      return {
+        data: data,
+        _meta: {
+          code: HttpStatus.ACCEPTED,
+          status: SUCCESS_STATUS,
+          message: 'success update pemeliharaan gedung',
         },
       };
     } catch (error) {

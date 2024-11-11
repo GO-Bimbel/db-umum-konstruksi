@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsEnum,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -12,10 +13,27 @@ import { PaginationDto } from './pagination-dto';
 import { kondisi_enum } from '@prisma/client';
 
 export class PemeliharaanGedungDto extends PaginationDto {
-  @ApiProperty({ required: false, example: kondisi_enum.BAGUS })
-  @Type(() => String)
+  @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
   @IsOptional()
-  @IsString()
+  @IsInt()
+  gedung_id?: number;
+
+  @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  bagian_gedung_detail_id?: number;
+
+  @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  ruang_id?: number;
+
+  @ApiProperty({ required: false, example: kondisi_enum.BAGUS })
+  @IsOptional()
+  @IsEnum(kondisi_enum)
   kondisi?: kondisi_enum;
 }
 
@@ -27,25 +45,21 @@ export class UpdatePemeliharaanGedungDto {
   bagian_gedung_detail: number;
 
   @ApiProperty({ required: true, example: kondisi_enum.BAGUS })
-  @Type(() => String)
   @IsNotEmpty()
-  @IsString()
+  @IsEnum(kondisi_enum)
   kondisi: kondisi_enum;
 
   @ApiProperty({ required: false, example: 'OK' })
-  @Type(() => String)
   @IsOptional()
   @IsString()
   catatan?: string;
 
   @ApiProperty({ required: true, example: 'http://img.com' })
-  @Type(() => String)
   @IsNotEmpty()
   @IsString()
   image_url: string;
 
   @ApiProperty({ required: true, example: '0239429' })
-  @Type(() => String)
   @IsNotEmpty()
   @IsString()
   updater_by: string;
@@ -72,25 +86,21 @@ class PemeliharaanGedungItemDto {
   bagian_gedung_detail: number;
 
   @ApiProperty({ required: true, example: kondisi_enum.BAGUS })
-  @Type(() => String)
   @IsNotEmpty()
-  @IsString()
+  @IsEnum(kondisi_enum)
   kondisi: kondisi_enum;
 
   @ApiProperty({ required: false, example: 'OK' })
-  @Type(() => String)
   @IsOptional()
   @IsString()
   catatan?: string;
 
   @ApiProperty({ required: true, example: 'http://img.com' })
-  @Type(() => String)
   @IsNotEmpty()
   @IsString()
   image_url: string;
 
   @ApiProperty({ required: true, example: '0239429' })
-  @Type(() => String)
   @IsNotEmpty()
   @IsString()
   updater_by: string;

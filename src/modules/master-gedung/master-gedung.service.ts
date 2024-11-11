@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { ApiService } from 'src/api/api.service';
-import { BagianGedungDto, DetailGedungDto, KomponenGedungDto } from 'src/dto/master-gedung-dto';
+import {
+  BagianGedungDto,
+  DetailGedungDto,
+  KomponenGedungDto,
+} from 'src/dto/master-gedung-dto';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class MasterGedungService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly apiService: ApiService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async get(params: BagianGedungDto) {
+  async getBagian(params: BagianGedungDto) {
     const skip = params.page ? (params.page - 1) * params.per_page : 0;
 
     const where: Prisma.bagian_gedungWhereInput = {
@@ -47,7 +47,7 @@ export class MasterGedungService {
         contains: params.keyword,
         mode: 'insensitive',
       },
-      id: params.bagian_gedung_id,
+      bagian_gedung_id: params.bagian_gedung_id,
     };
 
     const [data, total_data] = await Promise.all([
@@ -75,7 +75,7 @@ export class MasterGedungService {
         contains: params.keyword,
         mode: 'insensitive',
       },
-      id: params.bagian_gedung_komponen_id,
+      bagian_gedung_komponen_id: params.bagian_gedung_komponen_id,
     };
 
     const [data, total_data] = await Promise.all([

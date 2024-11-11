@@ -52,6 +52,7 @@ model pemeliharaan_gedung {
   image_url               String
   updated_at              DateTime             @default(now()) @db.Timestamptz(6)
   updated_by              String               @db.VarChar
+  ruang_id                Int?
   bagian_gedung_detail    bagian_gedung_detail @relation(fields: [bagian_gedung_detail_id], references: [id], onDelete: Cascade, map: "pemeliharaan_gedung_bagian_gedung_detail_fk")
 }
 
