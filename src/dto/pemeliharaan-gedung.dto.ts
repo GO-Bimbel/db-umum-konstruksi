@@ -24,12 +24,6 @@ export class UpdatePemeliharaanGedungDto {
   @Type(() => Number)
   @IsNotEmpty()
   @IsInt()
-  gedung_id: number;
-
-  @ApiProperty({ required: true, example: 1 })
-  @Type(() => Number)
-  @IsNotEmpty()
-  @IsInt()
   bagian_gedung_detail: number;
 
   @ApiProperty({ required: true, example: kondisi_enum.BAGUS })
@@ -49,7 +43,7 @@ export class UpdatePemeliharaanGedungDto {
   @IsNotEmpty()
   @IsString()
   image_url: string;
-  
+
   @ApiProperty({ required: true, example: '0239429' })
   @Type(() => String)
   @IsNotEmpty()
