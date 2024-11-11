@@ -17,6 +17,7 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new GlobalExceptionFilter());
+  app.setGlobalPrefix('api/v1');
   app.enableShutdownHooks();
   await app.listen(port);
   logger.log(`Application is running on: ${await app.getUrl()}`);
