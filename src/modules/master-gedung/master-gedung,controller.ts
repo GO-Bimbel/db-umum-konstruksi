@@ -21,48 +21,6 @@ export class MasterGedungController {
   private moment = require('moment-timezone');
   private locale = 'Asia/Jakarta';
 
-  //   @Patch(':id')
-  //   @ApiOperation({
-  //     summary: 'Update Enrollment',
-  //     description: 'Update enrollment using param id_barang and payloads',
-  //   })
-  //   async update(@Param('id') id: string, @Body() dto: UpdateEnrollmentDto) {
-  //     try {
-  //       const data = await this.masterGedungService.update(Number(id), dto);
-  //       return {
-  //         data: data,
-  //         _meta: {
-  //           code: HttpStatus.CREATED,
-  //           status: SUCCESS_STATUS,
-  //           message: 'success update enrollment',
-  //         },
-  //       };
-  //     } catch (error) {
-  //       throw error;
-  //     }
-  //   }
-
-  //   @Post()
-  //   @ApiOperation({
-  //     summary: 'Input Enrollment',
-  //     description: 'Input Enrollment ke Unit',
-  //   })
-  //   async post(@Body() dto: EnrollmentDto) {
-  //     try {
-  //       const data = await this.masterGedungService.post(dto);
-  //       return {
-  //         data: data,
-  //         _meta: {
-  //           code: HttpStatus.CREATED,
-  //           status: SUCCESS_STATUS,
-  //           message: 'success post enrollment',
-  //         },
-  //       };
-  //     } catch (error) {
-  //       throw error;
-  //     }
-  //   }
-
   @Get()
   @ApiOperation({
     summary: 'Get Bagian Gedung',
@@ -105,7 +63,8 @@ export class MasterGedungController {
   })
   async getDetail(@Query() params: BagianGedungDto) {
     try {
-      const { total_data, data } = await this.masterGedungService.getDetail(params);
+      const { total_data, data } =
+        await this.masterGedungService.getDetail(params);
 
       const metadata = {
         total_count: total_data,
@@ -140,7 +99,8 @@ export class MasterGedungController {
   })
   async getKomponen(@Query() params: BagianGedungDto) {
     try {
-      const { total_data, data } = await this.masterGedungService.getKomponen(params);
+      const { total_data, data } =
+        await this.masterGedungService.getKomponen(params);
 
       const metadata = {
         total_count: total_data,
