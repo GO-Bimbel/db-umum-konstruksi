@@ -13,7 +13,7 @@ image:
   registry: 518200711443.dkr.ecr.ap-southeast-1.amazonaws.com
   ## @params.image.repository: Image repository
   ##
-  repository: 'db-report-siswa-teori-service'
+  repository: 'db-umum-konstruksi-service'
   ## @skip image.tag: image tag (immutable tags are recommended)
   ## Overrides the image tag whose default is the chart appVersion.
   ##
@@ -33,7 +33,7 @@ image:
     - ecr-key
 ## @param nameOverride String to partially override fullname template (will maintain the release name)
 ##
-nameOverride: 'db-report-siswa-teori'
+nameOverride: 'db-umum-konstruksi'
 ## @param fullnameOverride: String to fully override fullname template
 ##
 fullnameOverride: ''
@@ -256,7 +256,7 @@ container:
   ##
   env:
   - name: DATABASE_URL
-    value: vault:secrets/data/config/db_url#DB_REPORT_TEORI
+    value: vault:secrets/data/config/db_url#DB_UMUM_KONSTRUKSI
   - name: SVC_DB_GO
     value: vault:secrets/data/config/service_url#SVC_DB_GO
   - name: SVC_DB_USER

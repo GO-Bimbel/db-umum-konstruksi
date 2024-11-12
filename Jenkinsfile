@@ -1,11 +1,11 @@
 pipeline {
     agent any
     environment {
-        IMAGE_REPO_NAME = "db-report-siswa-teori-service"
+        IMAGE_REPO_NAME = "db-umum-konstruksi-service"
         BUCKET_NAME = "gobimbel-spin"
-        HELM_STORE_PATH = "values/db-report-siswa-teori"
+        HELM_STORE_PATH = "values/db-umum-konstruksi"
         AWS_CREDENTIALS_ID = "jenkins-aws"
-        APP_NAME="db-report-siswa-teori"
+        APP_NAME="db-umum-konstruksi"
     }
     stages {
         stage('Clone repository') {
