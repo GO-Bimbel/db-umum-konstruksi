@@ -45,7 +45,7 @@ export class PemeliharaanGedungService {
       kondisi: item.kondisi,
       catatan: item.catatan || null,
       image_url: item.image_url,
-      updated_by: item.updater_by,
+      updated_by: item.updated_by,
     }));
 
     const createdRecords = await this.prisma.pemeliharaan_gedung.createMany({
@@ -66,7 +66,7 @@ export class PemeliharaanGedungService {
         catatan: dto.catatan || null,
         image_url: dto.image_url,
         updated_at: new Date(),
-        updated_by: dto.updater_by,
+        updated_by: dto.updated_by,
       },
     });
 

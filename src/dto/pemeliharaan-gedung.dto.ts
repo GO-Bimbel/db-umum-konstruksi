@@ -62,7 +62,7 @@ export class UpdatePemeliharaanGedungDto {
   @ApiProperty({ required: true, example: '0239429' })
   @IsNotEmpty()
   @IsString()
-  updater_by: string;
+  updated_by: string;
 }
 
 export class CreatePemeliharaanGedungDto {
@@ -103,5 +103,5 @@ class PemeliharaanGedungItemDto {
   @ApiProperty({ required: true, example: '0239429' })
   @IsNotEmpty()
   @IsString()
-  updater_by: string;
+  updated_by: string;
 }
