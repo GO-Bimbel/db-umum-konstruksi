@@ -41,7 +41,7 @@ export class PemeliharaanGedungService {
   async createPemeliharaanGedung(dto: CreatePemeliharaanGedungDto) {
     const createData = dto.data_pemeliharaan.map((item) => ({
       gedung_id: item.gedung_id,
-      bagian_gedung_detail_id: item.bagian_gedung_detail,
+      bagian_gedung_detail_id: item.bagian_gedung_detail_id,
       kondisi: item.kondisi,
       nama_ruang: item.nama_ruang,
       ruang_id: item.ruang_id,
@@ -63,7 +63,7 @@ export class PemeliharaanGedungService {
         id: id,
       },
       data: {
-        bagian_gedung_detail_id: dto.bagian_gedung_detail,
+        bagian_gedung_detail_id: dto.bagian_gedung_detail_id,
         kondisi: dto.kondisi,
         catatan: dto.catatan || null,
         image_url: dto.image_url,
