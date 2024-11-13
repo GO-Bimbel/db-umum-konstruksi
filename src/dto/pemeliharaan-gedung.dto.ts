@@ -79,6 +79,12 @@ class PemeliharaanGedungItemDto {
   @IsInt()
   gedung_id: number;
 
+  @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  ruang_id?: number;
+
   @ApiProperty({ required: true, example: 1 })
   @Type(() => Number)
   @IsNotEmpty()
@@ -94,6 +100,11 @@ class PemeliharaanGedungItemDto {
   @IsOptional()
   @IsString()
   catatan?: string;
+
+  @ApiProperty({ required: false, example: 'WC' })
+  @IsOptional()
+  @IsString()
+  nama_ruang?: string;
 
   @ApiProperty({ required: true, example: 'http://img.com' })
   @IsNotEmpty()

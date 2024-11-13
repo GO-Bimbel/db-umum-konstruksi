@@ -43,6 +43,8 @@ export class PemeliharaanGedungService {
       gedung_id: item.gedung_id,
       bagian_gedung_detail_id: item.bagian_gedung_detail,
       kondisi: item.kondisi,
+      nama_ruang: item.nama_ruang,
+      ruang_id: item.ruang_id,
       catatan: item.catatan || null,
       image_url: item.image_url,
       updated_by: item.updated_by,
