@@ -42,7 +42,7 @@ export class UpdatePemeliharaanGedungDto {
   @Type(() => Number)
   @IsNotEmpty()
   @IsInt()
-  bagian_gedung_detail: number;
+  bagian_gedung_detail_id: number;
 
   @ApiProperty({ required: true, example: kondisi_enum.BAGUS })
   @IsNotEmpty()
@@ -89,7 +89,7 @@ class PemeliharaanGedungItemDto {
   @Type(() => Number)
   @IsNotEmpty()
   @IsInt()
-  bagian_gedung_detail: number;
+  bagian_gedung_detail_id: number;
 
   @ApiProperty({ required: true, example: kondisi_enum.BAGUS })
   @IsNotEmpty()
