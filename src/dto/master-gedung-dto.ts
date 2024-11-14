@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PaginationDto } from './pagination-dto';
-import { IsInt, IsOptional, Min } from 'class-validator';
+import { IsInt, IsOptional, Min, IsString, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class BagianGedungDto extends PaginationDto {}
@@ -11,6 +11,30 @@ export class DetailGedungDto extends PaginationDto {
   @Min(1)
   @IsOptional()
   bagian_gedung_komponen_id: number;
+}
+export class DetailListGedungDto extends PaginationDto {
+  @ApiProperty({ required: true, example: 1 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @IsNotEmpty()
+  gedung_id: number;
+
+  @ApiProperty({ required: true, example: 1 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @IsNotEmpty()
+  bagian_gedung_id: number;
+}
+
+export class ImageDetailDto extends PaginationDto {
+  @ApiProperty({ required: true, example: 1 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @IsNotEmpty()
+  id: number;
 }
 export class KomponenGedungDto extends PaginationDto {
   @ApiProperty({ required: false, example: 1 })

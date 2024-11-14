@@ -4,6 +4,8 @@ import {
   BagianGedungDto,
   DetailGedungDto,
   KomponenGedungDto,
+  DetailListGedungDto,
+  ImageDetailDto,
 } from 'src/dto/master-gedung-dto';
 
 import { PrismaService } from 'src/prisma/prisma.service';

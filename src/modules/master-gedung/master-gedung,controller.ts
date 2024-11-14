@@ -5,6 +5,8 @@ import {
   BagianGedungDto,
   DetailGedungDto,
   KomponenGedungDto,
+  DetailListGedungDto,
+  ImageDetailDto,
 } from 'src/dto/master-gedung-dto';
 import { MasterGedungService } from './master-gedung.service';
 import { SUCCESS_STATUS } from 'src/dto/request-response.dto';
