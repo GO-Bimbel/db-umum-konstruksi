@@ -13,7 +13,7 @@ image:
   registry: 518200711443.dkr.ecr.ap-southeast-1.amazonaws.com
   ## @params.image.repository: Image repository
   ##
-  repository: 'db-umum-konstrukksi-service'
+  repository: 'db-umum-konstruksi-service'
   ## @skip image.tag: image tag (immutable tags are recommended)
   ## Overrides the image tag whose default is the chart appVersion.
   ##
@@ -32,7 +32,7 @@ image:
   pullSecrets: []
 ## @param nameOverride String to partially override fullname template (will maintain the release name)
 ##
-nameOverride: 'db-umum-konstrukksi'
+nameOverride: 'db-umum-konstruksi'
 ## @param fullnameOverride: String to fully override fullname template
 ##
 fullnameOverride: ''
@@ -246,7 +246,7 @@ affinity:
             - key: app
               operator: In
               values:
-                - db-umum-konstrukksi
+                - db-umum-konstruksi
         topologyKey: 'kubernetes.io/hostname'
     preferredDuringSchedulingIgnoredDuringExecution:
       - weight: 100
@@ -256,7 +256,7 @@ affinity:
               - key: app
                 operator: In
                 values:
-                  - db-umum-konstrukksi
+                  - db-umum-konstruksi
           topologyKey: 'topology.kubernetes.io/zone'
 ## @params.additionalSecrets add Secret to Application Pods
 ##
@@ -398,7 +398,7 @@ container:
         command:
           - sh
           - -c
-          - echo "Stopping container now.." >/proc/1/fd/1 && db-umum-konstrukksi -s stop
+          - echo "Stopping container now.." >/proc/1/fd/1 && db-umum-konstruksi -s stop
   ## Configure extra options for Application containers' liveness and readiness probes
   ##
   livenessProbe:
