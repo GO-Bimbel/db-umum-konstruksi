@@ -1,5 +1,5 @@
 ## @params.replicaCount: The desired number of replicas for the Deployment.
-## This doesnt require if @params.autoscaling.enabled is true
+## This doesnt require if @params.autoscaling.enabled is true.
 ##
 replicaCount: 1
 ## @params.type: Type of deployment
