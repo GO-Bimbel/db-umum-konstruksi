@@ -34,7 +34,7 @@ export class ImageDetailDto extends PaginationDto {
   @IsInt()
   @Min(1)
   @IsNotEmpty()
-  id: number;
+  pemeliharaan_gedung_id: number;
 }
 export class KomponenGedungDto extends PaginationDto {
   @ApiProperty({ required: false, example: 1 })

@@ -143,7 +143,7 @@ export class PemeliharaanGedungService {
     const skip = params.page ? (params.page - 1) * params.per_page : 0;
 
     const where: Prisma.pemeliharaan_gedungWhereInput = {
-      id: params.id,
+      id: params.pemeliharaan_gedung_id,
     };
 
     const [data, total_data] = await Promise.all([
