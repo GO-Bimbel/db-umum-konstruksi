@@ -356,7 +356,7 @@ container:
   livenessProbe:
     failureThreshold: 3
     httpGet:
-      path: /health
+      path: /api/v1/health
       port: http
     initialDelaySeconds: 1
     periodSeconds: 10
@@ -366,7 +366,7 @@ container:
   readinessProbe:
     failureThreshold: 3
     httpGet:
-      path: /health
+      path: /api/v1/health
       port: http
     initialDelaySeconds: 1
     periodSeconds: 10
