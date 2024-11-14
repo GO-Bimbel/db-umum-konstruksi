@@ -232,7 +232,7 @@ nodeSelector:
 ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 ##
 tolerations:
-  - key: high-throughput
+  - key: db
     operator: Equal
     value: 'true'
 ## @param affinity Affinity for pod assignment
@@ -269,7 +269,7 @@ additionalConfigMap: {}
 container:
   ## @params.container.port Container Application Port
   ##
-  port: 3041
+  port: 3220
   ## @params.container.additionalPort Additional container port
   ##
   additionalPort: []
@@ -278,54 +278,6 @@ container:
   env:
   - name: DATABASE_URL
     value: vault:secrets/data/config/db_url#DB_UMUM_KONSTRUKSI
-  - name: SVC_DB_GO
-    value: vault:secrets/data/config/service_url#SVC_DB_GO
-  - name: SVC_DB_USER
-    value: vault:secrets/data/config/service_url#SVC_DB_USER
-  - name: SVC_DB_PRODUK
-    value: vault:secrets/data/config/service_url#SVC_DB_PRODUCT
-  - name: SVC_DB_MATERI
-    value: vault:secrets/data/config/service_url#SVC_DB_MATERI
-  - name: SVC_DB_KBM
-    value: vault:secrets/data/config/service_url#SVC_DB_KBM
-  - name: SVC_DB_PT
-    value: vault:secrets/data/config/service_url#SVC_DB_PT
-  - name: SVC_DB_SEKOLAH
-    value: vault:secrets/data/config/service_url#SVC_DB_SEKOLAH
-  - name: SVC_DB_PRODUK_TEASER
-    value: vault:secrets/data/config/service_url#SVC_DB_PRODUCT_TEASER
-  - name: SVC_DB_MATERI_TEASER
-    value: vault:secrets/data/config/service_url#SVC_DB_MATERI_TEASER
-  - name: SVC_DB_REPORT_PERINGKAT
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_PERINGKAT
-  - name: SVC_DB_USER_TAMU
-    value: vault:secrets/data/config/service_url#SVC_DB_USER_TAMU
-  - name: SVC_DB_REPORT_IRT
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_IRT
-  - name: SVC_DB_REPORT_TOBK
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_TOBK
-  - name: SVC_DB_REPORT_VAK
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_VAK
-  - name: SVC_DB_REPORT_KUIS
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_KUIS
-  - name: SVC_DB_REPORT_LATEKS
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_LATEKS
-  - name: SVC_DB_REPORT_GOA
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_GOA
-  - name: SVC_DB_REPORT_EMWA
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_EMWA
-  - name: SVC_DB_REPORT_EMMA
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_EMMA
-  - name: SVC_DB_REPORT_INTENSIF
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_INTENSIF
-  - name: SVC_DB_REPORT_PAMAT
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_PAMAT
-  - name: SVC_DB_REPORT_RACING
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_RACING
-  - name: SVC_DB_REPORT_SOREF
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_SOREF
-  - name: SVC_DB_REPORT_KODING
-    value: vault:secrets/data/config/service_url#SVC_DB_REPORT_KODING
   - name: PORT
     value: "3220"
 
