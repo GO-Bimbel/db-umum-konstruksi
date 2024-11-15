@@ -29,12 +29,10 @@ export class DetailListGedungDto extends PaginationDto {
 }
 
 export class ImageDetailDto extends PaginationDto {
-  @ApiProperty({ required: true, example: 1 })
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
+  @ApiProperty({ required: true, example: "1,2" })
+  @IsString()
   @IsNotEmpty()
-  id: number;
+  pemeliharaan_gedung_ids: string;
 }
 export class KomponenGedungDto extends PaginationDto {
   @ApiProperty({ required: false, example: 1 })

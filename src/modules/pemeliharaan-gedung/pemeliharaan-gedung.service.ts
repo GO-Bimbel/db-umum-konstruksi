@@ -7,6 +7,7 @@ import {
   UpdatePemeliharaanGedungDto,
 } from 'src/dto/pemeliharaan-gedung.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CustomError } from 'src/utils/CustomError';
 
 @Injectable()
 export class PemeliharaanGedungService {
@@ -40,6 +41,27 @@ export class PemeliharaanGedungService {
   }
 
   async createPemeliharaanGedung(dto: CreatePemeliharaanGedungDto) {
+    for (const item of dto.data_pemeliharaan) {
+      const bagianDetail = await this.prisma.bagian_gedung_detail.findUnique({
+        where: { id: item.bagian_gedung_detail_id },
+        select: { maks_foto: true },
+      });
+
+      const existingCount = await this.prisma.pemeliharaan_gedung.count({
+        where: {
+          gedung_id: item.gedung_id,
+          bagian_gedung_detail_id: item.bagian_gedung_detail_id,
+        },
+      });
+
+      if (existingCount >= bagianDetail.maks_foto) {
+        throw new CustomError(
+          `Maximum photo limit (${bagianDetail.maks_foto}) reached for bagian gedung detail ID ${item.bagian_gedung_detail_id}.`,
+          400,
+        );
+      }
+    }
+
     const createData = dto.data_pemeliharaan.map((item) => ({
       gedung_id: item.gedung_id,
       bagian_gedung_detail_id: item.bagian_gedung_detail_id,
@@ -126,11 +148,7 @@ export class PemeliharaanGedungService {
         id: item.id,
         nama_komponen: item.bagian_gedung_komponen.nama,
         detail_komponen: item.nama,
-        pemeliharaan_gedung_id: item.pemeliharaan_gedung.filter(
-          (list) =>
-            list.bagian_gedung_detail_id === item.id &&
-            list.gedung_id === params.gedung_id,
-        )[0]?.id,
+        pemeliharaan_gedung_id: item.pemeliharaan_gedung.map((list) => list.id),
       };
     });
 
@@ -143,7 +161,9 @@ export class PemeliharaanGedungService {
     const skip = params.page ? (params.page - 1) * params.per_page : 0;
 
     const where: Prisma.pemeliharaan_gedungWhereInput = {
-      id: params.id,
+      id: {
+        in: params.pemeliharaan_gedung_ids.split(',').map(Number),
+      },
     };
 
     const [data, total_data] = await Promise.all([
