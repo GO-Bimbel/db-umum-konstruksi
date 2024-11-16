@@ -148,7 +148,9 @@ export class PemeliharaanGedungService {
         id: item.id,
         nama_komponen: item.bagian_gedung_komponen.nama,
         detail_komponen: item.nama,
-        pemeliharaan_gedung_id: item.pemeliharaan_gedung.map((list) => list.id),
+        pemeliharaan_gedung_id: item.pemeliharaan_gedung
+          .filter((pemeliharaan) => pemeliharaan.gedung_id === params.gedung_id)
+          .map((pemeliharaan) => pemeliharaan.id),
       };
     });
 
