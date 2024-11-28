@@ -42,40 +42,47 @@ export class PemeliharaanGedungService {
 
   async createPemeliharaanGedung(dto: CreatePemeliharaanGedungDto) {
     await this.prisma.$transaction(async (tx) => {
+      const now = new Date();
+      const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const periode = now.getDate() <= 14 ? 1 : 2;
+
+      const gedung_id = dto.data_pemeliharaan[0].gedung_id;
+      const bagian_gedung_detail_id =
+        dto.data_pemeliharaan[0].bagian_gedung_detail_id;
+
+      const existingCount = await tx.pemeliharaan_gedung.count({
+        where: {
+          gedung_id,
+          bagian_gedung_detail_id,
+          bulan,
+          periode,
+        },
+      });
+
+      const bagianDetail = await tx.bagian_gedung_detail.findUnique({
+        where: { id: bagian_gedung_detail_id },
+        select: { maks_foto: true },
+      });
+
+      const totalUploads = existingCount + dto.data_pemeliharaan.length;
+      if (totalUploads > bagianDetail.maks_foto) {
+        const remaining = bagianDetail.maks_foto - existingCount;
+        throw new CustomError(
+          `Sudah ada (${existingCount}) dari maksimal (${bagianDetail.maks_foto}) data foto tersimpan untuk bagian gedung detail ID ${bagian_gedung_detail_id}. ` +
+            `Kamu hanya boleh upload ${remaining < 0 ? 0 : remaining} foto lagi di periode ini.`,
+          400,
+        );
+      }
+
       for (const item of dto.data_pemeliharaan) {
-        const now = new Date();
-        const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-        const periode = now.getDate() <= 14 ? 1 : 2;
-
-        const bagianDetail = await tx.bagian_gedung_detail.findUnique({
-          where: { id: item.bagian_gedung_detail_id },
-          select: { maks_foto: true },
-        });
-
-        const existingCount = await tx.pemeliharaan_gedung.count({
-          where: {
-            gedung_id: item.gedung_id,
-            bagian_gedung_detail_id: item.bagian_gedung_detail_id,
-            bulan: bulan,
-            periode: periode,
-          },
-        });
-
-        if (existingCount >= bagianDetail.maks_foto) {
-          throw new CustomError(
-            `Maximum photo limit (${bagianDetail.maks_foto}) reached for bagian gedung detail ID ${item.bagian_gedung_detail_id}.`,
-            400,
-          );
-        }
-
         await tx.pemeliharaan_gedung.create({
           data: {
             gedung_id: item.gedung_id,
             bagian_gedung_detail_id: item.bagian_gedung_detail_id,
             kondisi: item.kondisi,
-            nama_ruang: item.nama_ruang || null,
-            ruang_id: item.ruang_id || null,
-            catatan: item.catatan || null,
+            nama_ruang: item.nama_ruang,
+            ruang_id: item.ruang_id,
+            catatan: item.catatan,
             image_url: item.image_url,
             updated_by: item.updated_by,
             bulan: bulan,
