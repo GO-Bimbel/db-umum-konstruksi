@@ -55,6 +55,8 @@ model pemeliharaan_gedung {
   updated_by              String               @db.VarChar
   ruang_id                Int?
   nama_ruang              String?              @db.VarChar
+  bulan                   String?              @db.VarChar
+  periode                 Int?
   bagian_gedung_detail    bagian_gedung_detail @relation(fields: [bagian_gedung_detail_id], references: [id], onDelete: Cascade, map: "pemeliharaan_gedung_bagian_gedung_detail_fk")
 }
 
