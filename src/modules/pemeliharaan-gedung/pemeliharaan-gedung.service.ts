@@ -41,43 +41,51 @@ export class PemeliharaanGedungService {
   }
 
   async createPemeliharaanGedung(dto: CreatePemeliharaanGedungDto) {
-    for (const item of dto.data_pemeliharaan) {
-      const bagianDetail = await this.prisma.bagian_gedung_detail.findUnique({
-        where: { id: item.bagian_gedung_detail_id },
-        select: { maks_foto: true },
-      });
+    await this.prisma.$transaction(async (tx) => {
+      for (const item of dto.data_pemeliharaan) {
+        const now = new Date();
+        const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const periode = now.getDate() <= 14 ? 1 : 2;
 
-      const existingCount = await this.prisma.pemeliharaan_gedung.count({
-        where: {
-          gedung_id: item.gedung_id,
-          bagian_gedung_detail_id: item.bagian_gedung_detail_id,
-        },
-      });
+        const bagianDetail = await tx.bagian_gedung_detail.findUnique({
+          where: { id: item.bagian_gedung_detail_id },
+          select: { maks_foto: true },
+        });
 
-      if (existingCount >= bagianDetail.maks_foto) {
-        throw new CustomError(
-          `Maximum photo limit (${bagianDetail.maks_foto}) reached for bagian gedung detail ID ${item.bagian_gedung_detail_id}.`,
-          400,
-        );
+        const existingCount = await tx.pemeliharaan_gedung.count({
+          where: {
+            gedung_id: item.gedung_id,
+            bagian_gedung_detail_id: item.bagian_gedung_detail_id,
+            bulan: bulan,
+            periode: periode,
+          },
+        });
+
+        if (existingCount >= bagianDetail.maks_foto) {
+          throw new CustomError(
+            `Maximum photo limit (${bagianDetail.maks_foto}) reached for bagian gedung detail ID ${item.bagian_gedung_detail_id}.`,
+            400,
+          );
+        }
+
+        await tx.pemeliharaan_gedung.create({
+          data: {
+            gedung_id: item.gedung_id,
+            bagian_gedung_detail_id: item.bagian_gedung_detail_id,
+            kondisi: item.kondisi,
+            nama_ruang: item.nama_ruang || null,
+            ruang_id: item.ruang_id || null,
+            catatan: item.catatan || null,
+            image_url: item.image_url,
+            updated_by: item.updated_by,
+            bulan: bulan,
+            periode: periode,
+          },
+        });
       }
-    }
 
-    const createData = dto.data_pemeliharaan.map((item) => ({
-      gedung_id: item.gedung_id,
-      bagian_gedung_detail_id: item.bagian_gedung_detail_id,
-      kondisi: item.kondisi,
-      nama_ruang: item.nama_ruang,
-      ruang_id: item.ruang_id,
-      catatan: item.catatan || null,
-      image_url: item.image_url,
-      updated_by: item.updated_by,
-    }));
-
-    const createdRecords = await this.prisma.pemeliharaan_gedung.createMany({
-      data: createData,
+      return { message: 'Records created successfully' };
     });
-
-    return { createdRecordsCount: createdRecords.count };
   }
 
   async updatePemeliharaanGedung(id: number, dto: UpdatePemeliharaanGedungDto) {
