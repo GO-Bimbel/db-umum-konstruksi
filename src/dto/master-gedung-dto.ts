@@ -26,10 +26,21 @@ export class DetailListGedungDto extends PaginationDto {
   @Min(1)
   @IsNotEmpty()
   bagian_gedung_id: number;
+
+  @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
+  @IsInt()
+  @IsOptional()
+  periode?: number;
+
+  @ApiProperty({ required: false, example: '2024-11' })
+  @IsString()
+  @IsOptional()
+  bulan?: string;
 }
 
 export class ImageDetailDto extends PaginationDto {
-  @ApiProperty({ required: true, example: "1,2" })
+  @ApiProperty({ required: true, example: '1,2' })
   @IsString()
   @IsNotEmpty()
   pemeliharaan_gedung_ids: string;

@@ -120,6 +120,8 @@ export class PemeliharaanGedungService {
       pemeliharaan_gedung: {
         some: {
           gedung_id: params.gedung_id,
+          bulan: params.bulan,
+          periode: params.periode,
         },
       },
       bagian_gedung_komponen: {
