@@ -9,6 +9,13 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CustomError } from 'src/utils/CustomError';
 
+export interface PemeliharaanGedung {
+  id: number;
+  nama_komponen: string;
+  detail_komponen: string;
+  pemeliharaan_gedung_id: number[];
+}
+
 @Injectable()
 export class PemeliharaanGedungService {
   constructor(private readonly prisma: PrismaService) {}
@@ -102,11 +109,6 @@ export class PemeliharaanGedungService {
     const skip = params.page ? (params.page - 1) * params.per_page : 0;
 
     const where: Prisma.bagian_gedung_detailWhereInput = {
-      pemeliharaan_gedung: {
-        some: {
-          gedung_id: params.gedung_id,
-        },
-      },
       bagian_gedung_komponen: {
         bagian_gedung: {
           id: params.bagian_gedung_id,
@@ -115,48 +117,35 @@ export class PemeliharaanGedungService {
     };
 
     const [data, total_data] = await Promise.all([
-      this.prisma.bagian_gedung_detail.findMany({
-        where,
-        select: {
-          id: true,
-          nama: true,
-          bagian_gedung_komponen: {
-            select: {
-              nama: true,
-            },
-          },
-          pemeliharaan_gedung: {
-            select: {
-              id: true,
-              bagian_gedung_detail_id: true,
-              gedung_id: true,
-              image_url: true,
-            },
-          },
-        },
-
-        skip: params.is_all_data ? undefined : skip,
-        take: params.is_all_data ? undefined : params.per_page,
-      }),
-      this.prisma.bagian_gedung_detail.count({
-        where,
-      }),
+      this.prisma.$queryRaw<PemeliharaanGedung[]>`
+          SELECT 
+              bgd.id id,
+              bgk.nama AS nama_komponen,
+              bgd.nama AS detail_komponen,
+              COALESCE(jsonb_agg(pg.id) FILTER (WHERE pg.id IS NOT NULL), '[]'::jsonb) AS pemeliharaan_gedung_id
+          FROM bagian_gedung_detail bgd
+          JOIN bagian_gedung_komponen bgk ON bgk.id = bgd.bagian_gedung_komponen_id 
+          LEFT JOIN pemeliharaan_gedung pg ON pg.bagian_gedung_detail_id = bgd.id AND (pg.gedung_id = ${params.gedung_id} OR pg.gedung_id IS NULL)
+          WHERE bgk.bagian_gedung_id = ${params.bagian_gedung_id}
+          GROUP BY bgk.id, bgd.id, bgk.nama, bgd.nama
+          ORDER BY 
+              (COALESCE(jsonb_agg(pg.id) FILTER (WHERE pg.id IS NOT NULL), '[]'::jsonb) = '[]'::jsonb) ASC,
+              bgk.id, bgd.id
+          ${params.is_all_data ? Prisma.empty : Prisma.sql`LIMIT ${params.per_page} OFFSET ${skip}`};
+      `,
+      this.prisma.$queryRaw<{ count: number }[]>`
+          SELECT 
+              COUNT(*)::int
+          FROM bagian_gedung_detail bgd
+          JOIN bagian_gedung_komponen bgk ON bgk.id = bgd.bagian_gedung_komponen_id 
+          WHERE bgk.bagian_gedung_id = ${params.bagian_gedung_id}
+          GROUP BY bgk.id, bgd.id, bgk.nama, bgd.nama
+      `,
     ]);
 
-    const output = data.map((item) => {
-      return {
-        id: item.id,
-        nama_komponen: item.bagian_gedung_komponen.nama,
-        detail_komponen: item.nama,
-        pemeliharaan_gedung_id: item.pemeliharaan_gedung
-          .filter((pemeliharaan) => pemeliharaan.gedung_id === params.gedung_id)
-          .map((pemeliharaan) => pemeliharaan.id),
-      };
-    });
-
     return {
-      total_data: total_data,
-      data: output,
+      total_data: total_data[0].count,
+      data: data,
     };
   }
   async getKomponenDetail(params: ImageDetailDto) {
