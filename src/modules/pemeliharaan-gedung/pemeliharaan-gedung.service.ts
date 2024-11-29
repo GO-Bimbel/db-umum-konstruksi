@@ -84,7 +84,6 @@ export class PemeliharaanGedungService {
       gedung_id: gedung_id,
       bagian_gedung_detail_id: bagian_gedung_detail_id,
       kondisi: item.kondisi,
-      nama_ruang: item.nama_ruang || null,
       ruang_id: item.ruang_id || null,
       catatan: item.catatan || null,
       image_url: item.image_url,
@@ -94,7 +93,7 @@ export class PemeliharaanGedungService {
     }));
 
     await this.prisma.$transaction(async (tx) => {
-      await tx.pemeliharaan_gedung.createMany({
+      await tx.pemeliharaan_gedung_foto.createMany({
         data: createData,
       });
 
