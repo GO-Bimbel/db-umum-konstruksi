@@ -17,15 +17,16 @@ model bagian_gedung {
 }
 
 model bagian_gedung_detail {
-  id                        Int                    @id(map: "bagian_gedung_detail_pk") @default(autoincrement())
+  id                        Int                        @id(map: "bagian_gedung_detail_pk") @default(autoincrement())
   bagian_gedung_komponen_id Int
-  nama                      String                 @db.VarChar
+  nama                      String                     @db.VarChar
   maks_foto                 Int
-  created_at                DateTime               @default(now()) @db.Timestamptz(6)
-  updated_at                DateTime               @default(now()) @db.Timestamptz(6)
-  updated_by                String                 @db.VarChar
-  bagian_gedung_komponen    bagian_gedung_komponen @relation(fields: [bagian_gedung_komponen_id], references: [id], onDelete: Cascade, map: "bagian_gedung_detail_bagian_gedung_komponen_fk")
+  created_at                DateTime                   @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime                   @default(now()) @db.Timestamptz(6)
+  updated_by                String                     @db.VarChar
+  bagian_gedung_komponen    bagian_gedung_komponen     @relation(fields: [bagian_gedung_komponen_id], references: [id], onDelete: Cascade, map: "bagian_gedung_detail_bagian_gedung_komponen_fk")
   pemeliharaan_gedung       pemeliharaan_gedung[]
+  pemeliharaan_gedung_foto  pemeliharaan_gedung_foto[]
 
   @@unique([bagian_gedung_komponen_id, nama], map: "bagian_gedung_detail_unique")
 }
@@ -58,6 +59,22 @@ model pemeliharaan_gedung {
   bulan                   String?              @db.VarChar
   periode                 Int?
   bagian_gedung_detail    bagian_gedung_detail @relation(fields: [bagian_gedung_detail_id], references: [id], onDelete: Cascade, map: "pemeliharaan_gedung_bagian_gedung_detail_fk")
+}
+
+model pemeliharaan_gedung_foto {
+  id                      Int                  @id(map: "pemeliharaan_gedung_foto_pk") @default(autoincrement())
+  gedung_id               Int
+  bagian_gedung_detail_id Int
+  image_url               String
+  kondisi                 kondisi_enum
+  catatan                 String?
+  updated_at              DateTime             @default(now()) @db.Timestamptz(6)
+  updated_by              String               @db.VarChar
+  bulan                   String?              @db.VarChar
+  periode                 Int?
+  bagian_gedung_detail    bagian_gedung_detail @relation(fields: [bagian_gedung_detail_id], references: [id], onDelete: Cascade, map: "pemeliharaan_gedung_foto_fk")
+
+  @@unique([gedung_id, bagian_gedung_detail_id, bulan, periode], map: "pemeliharaan_gedung_foto_unique")
 }
 
 enum kondisi_enum {
