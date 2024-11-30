@@ -86,6 +86,7 @@ export class PemeliharaanGedungService {
       gedung_id: gedung_id,
       bagian_gedung_detail_id: bagian_gedung_detail_id,
       kondisi: item.kondisi,
+      nama_ruang: item.nama_ruang || null,
       ruang_id: item.ruang_id || null,
       catatan: item.catatan || null,
       bulan: bulan,
@@ -103,17 +104,17 @@ export class PemeliharaanGedungService {
             periode,
           },
         },
-        create: createData[0], 
-        update: {}, 
+        create: createData[0],
+        update: {},
       });
 
-      const createFotoData = dto.data_pemeliharaan.map((item) => ({
+      const createFotoData = {
         pemeliharaan_gedung_id: pemeliharaanGedung.id,
-        image_url: item.image_url,
-        updated_by: item.updated_by,
-      }));
+        image_url: dto.data_pemeliharaan[0].image_url,
+        updated_by: dto.data_pemeliharaan[0].updated_by,
+      };
 
-      await tx.pemeliharaan_gedung_foto.createMany({
+      await tx.pemeliharaan_gedung_foto.create({
         data: createFotoData,
       });
 
@@ -133,9 +134,7 @@ export class PemeliharaanGedungService {
         kondisi: dto.kondisi,
         catatan: dto.catatan || null,
         // image_url: dto.image_url,
-        pemeliharaan_gedung_foto :{
-          
-        },
+        pemeliharaan_gedung_foto: {},
         updated_at: new Date(),
         updated_by: dto.updated_by,
       },
