@@ -82,17 +82,17 @@ export class PemeliharaanGedungService {
       );
     }
 
-    const createData = dto.data_pemeliharaan.map((item) => ({
+    const createData = {
       gedung_id: gedung_id,
       bagian_gedung_detail_id: bagian_gedung_detail_id,
-      kondisi: item.kondisi,
-      nama_ruang: item.nama_ruang || null,
-      ruang_id: item.ruang_id || null,
-      catatan: item.catatan || null,
+      kondisi: dto.data_pemeliharaan[0].kondisi,
+      nama_ruang: dto.data_pemeliharaan[0].nama_ruang || null,
+      ruang_id: dto.data_pemeliharaan[0].ruang_id || null,
+      catatan: dto.data_pemeliharaan[0].catatan || null,
       bulan: bulan,
       periode: periode,
-      updated_by: item.updated_by,
-    }));
+      updated_by: dto.data_pemeliharaan[0].updated_by,
+    };
 
     const result = await this.prisma.$transaction(async (tx) => {
       const pemeliharaanGedung = await tx.pemeliharaan_gedung.upsert({
@@ -104,17 +104,17 @@ export class PemeliharaanGedungService {
             periode,
           },
         },
-        create: createData[0],
+        create: createData,
         update: {},
       });
 
-      const createFotoData = {
+      const createFotoData = dto.data_pemeliharaan.map((item) => ({
         pemeliharaan_gedung_id: pemeliharaanGedung.id,
-        image_url: dto.data_pemeliharaan[0].image_url,
-        updated_by: dto.data_pemeliharaan[0].updated_by,
-      };
+        image_url: item.image_url,
+        updated_by: item.updated_by,
+      }));
 
-      await tx.pemeliharaan_gedung_foto.create({
+      await tx.pemeliharaan_gedung_foto.createMany({
         data: createFotoData,
       });
 
