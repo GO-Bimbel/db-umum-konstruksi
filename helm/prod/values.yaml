@@ -371,6 +371,15 @@ container:
     initialDelaySeconds: 1
     periodSeconds: 10
     timeoutSeconds: 300
+  ##
+  startupProbe:
+    failureThreshold: 3
+    httpGet:
+      path: /api/v1/health
+      port: http
+    initialDelaySeconds: 1
+    periodSeconds: 10
+    timeoutSeconds: 300
 ## Pod Disruption Budget configuration
 ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
 ##
