@@ -67,15 +67,25 @@ export class PemeliharaanGedungService {
 
     const bagianDetail = await this.prisma.bagian_gedung_detail.findUnique({
       where: { id: bagian_gedung_detail_id },
-      select: { maks_foto: true },
+      select: { 
+        nama: true,
+        maks_foto: true
+      },
     });
 
     const totalUploads = existingCount + dto.data_pemeliharaan.length;
+    if (existingCount == bagianDetail.maks_foto) {
+      throw new CustomError(
+        `Sudah ada (${existingCount}) dari maksimal (${bagianDetail.maks_foto}) data foto tersimpan untuk ${bagianDetail.nama}. ` +
+          `Anda tidak bisa mengupload foto lagi di periode ini`,
+        400,
+      );
+    }
     if (totalUploads > bagianDetail.maks_foto) {
       const remaining = bagianDetail.maks_foto - existingCount;
       throw new CustomError(
-        `Sudah ada (${existingCount}) dari maksimal (${bagianDetail.maks_foto}) data foto tersimpan untuk bagian gedung detail ID ${bagian_gedung_detail_id}. ` +
-          `Kamu hanya boleh upload ${remaining < 0 ? 0 : remaining} foto lagi di periode ini.`,
+        `Sudah ada (${existingCount}) dari maksimal (${bagianDetail.maks_foto}) data foto tersimpan untuk ${bagianDetail.nama}. ` +
+          `Anda hanya boleh upload ${remaining < 0 ? 0 : remaining} foto lagi di periode ini.`,
         400,
       );
     }
