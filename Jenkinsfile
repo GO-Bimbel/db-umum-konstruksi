@@ -88,6 +88,36 @@ pipeline {
             }
         }
 
+        stage('Install Trivy & Scan Image') {
+            when {
+                anyOf {
+                    branch 'staging'
+                }
+            }
+            steps {
+                container('dind'){
+                    sh '''
+                    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /tmp
+                    /tmp/trivy image --format template --template "@trivy-report.tpl" -o trivy-report.html ${IMAGE_REPO_NAME}
+                    '''
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'trivy-report.html', allowEmptyArchive: true
+                    publishHTML(target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: "${WORKSPACE}",
+                        reportFiles: 'trivy-report.html',
+                        reportName: 'Trivy-Report',
+                        reportTitles: 'Trivy-Report'
+                    ])
+                }
+            }
+        }
+
         stage('Push Image to Repository') {
             when {
                 anyOf {
@@ -121,12 +151,12 @@ pipeline {
                 def today = sh(script: 'date +"%b %d"', returnStdout: true).trim()
 
                 sh """
-                    sed -i 's|%%JOBNAME%%|${env.JOB_NAME}|g' report.html
-                    sed -i 's|%%BUILDNO%%|${env.BUILD_NUMBER}|g' report.html
-                    sed -i 's|%%DATE%%|${today}|g' report.html
-                    sed -i 's|%%BUILD_STATUS%%|${BUILD_STATUS}|g' report.html
-                    sed -i 's|%%ERROR%%|${BUILD_ERROR}|g' report.html
-                    sed -i 's|%%CONSOLE_LOG%%|${CONSOLE_LOG}|g' report.html
+                    sed -i 's|%%JOBNAME%%|${env.JOB_NAME}|g' slack-report.html
+                    sed -i 's|%%BUILDNO%%|${env.BUILD_NUMBER}|g' slack-report.html
+                    sed -i 's|%%DATE%%|${today}|g' slack-report.html
+                    sed -i 's|%%BUILD_STATUS%%|${BUILD_STATUS}|g' slack-report.html
+                    sed -i 's|%%ERROR%%|${BUILD_ERROR}|g' slack-report.html
+                    sed -i 's|%%CONSOLE_LOG%%|${CONSOLE_LOG}|g' slack-report.html
                 """
             }
             publishHTML(target: [
@@ -134,7 +164,7 @@ pipeline {
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
                 reportDir: "${WORKSPACE}",
-                reportFiles: 'report.html',
+                reportFiles: 'slack-report.html',
                 reportName: 'Build-Report',
                 reportTitles: 'Build-Report'
             ])
