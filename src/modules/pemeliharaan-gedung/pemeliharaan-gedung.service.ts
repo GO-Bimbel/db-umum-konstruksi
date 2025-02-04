@@ -67,9 +67,9 @@ export class PemeliharaanGedungService {
 
     const bagianDetail = await this.prisma.bagian_gedung_detail.findUnique({
       where: { id: bagian_gedung_detail_id },
-      select: { 
+      select: {
         nama: true,
-        maks_foto: true
+        maks_foto: true,
       },
     });
 
@@ -167,11 +167,10 @@ export class PemeliharaanGedungService {
       `,
       this.prisma.$queryRaw<{ count: number }[]>`
           SELECT 
-              COUNT(*)::int
+          COUNT(DISTINCT bgd.id)::int AS count
           FROM bagian_gedung_detail bgd
           JOIN bagian_gedung_komponen bgk ON bgk.id = bgd.bagian_gedung_komponen_id 
           WHERE bgk.bagian_gedung_id = ${params.bagian_gedung_id}
-          GROUP BY bgk.id, bgd.id, bgk.nama, bgd.nama
       `,
     ]);
 
