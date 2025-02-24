@@ -414,7 +414,7 @@ verticalPodAutoscaler:
 gateway:
   ## @params.gateway.enabled Enables the Istio Gateway.
   ##
-  enabled: false
+  enabled: true
   ## @params.gateway.namespace Optionally specify the namespace for the Gateway.
   ##
   namespace:
@@ -423,7 +423,7 @@ gateway:
   annotations: {}
   ## @params.gateway.selector Define which pods will be selected for this Gateway (usually the ingressgateway pod).
   ##
-  selector: ''
+  selector: 'ingress'
   ## @params.gateway.hosts List of hosts for which this Gateway will route traffic.
   ##
   hosts: []
@@ -432,7 +432,7 @@ gateway:
   tls:
     ## @params.gateway.tls.enabled Enables TLS for the Gateway.
     ##
-    enabled: true
+    enabled: false
     ## @params.gateway.tls.secretName Specify the secret name for the TLS certificate (required for termination).
     ##
     secretName:
@@ -452,7 +452,7 @@ gateway:
 virtualService:
   ## @params.virtualService.enabled Enables the virtual service istio
   ##
-  enabled: false
+  enabled: true
   ## @params.virtualService.http HTTP Configuration for Virtual Service
   ## @params.virtualService.route Routing Configuration for HTTP
   ## @params.virtualService.destination Target Destination for Routing
@@ -460,11 +460,7 @@ virtualService:
   ## @params.virtualService.destination.port.number The port number of the service.
   ##
   http:
-    - route:
-        - destination:
-            host:
-            port:
-              number:
+    headers:
   ## @params.virtualService.tls Configuration for TLS Traffic (if applicable)
   ##
   tls:
