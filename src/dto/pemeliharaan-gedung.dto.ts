@@ -12,6 +12,18 @@ import {
 import { PaginationDto } from './pagination-dto';
 import { kondisi_enum } from '@prisma/client';
 
+export class OpsiCakupanDto {
+  @ApiProperty({ required: true, example: '2020066002' })
+  @IsNotEmpty()
+  @IsString()
+  nik: string;
+
+  @ApiProperty({ required: true, example: 1 })
+  @IsNotEmpty()
+  @IsInt()
+  id: number;
+}
+
 export class PemeliharaanGedungDto extends PaginationDto {
   @ApiProperty({ required: false, example: 1 })
   @Type(() => Number)

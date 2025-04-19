@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DetailListGedungDto, ImageDetailDto } from 'src/dto/master-gedung-dto';
 import {
+  OpsiCakupanDto,
   CreatePemeliharaanGedungDto,
   PemeliharaanGedungDto,
   UpdatePemeliharaanGedungDto,
 } from 'src/dto/pemeliharaan-gedung.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CustomError } from 'src/utils/CustomError';
+import { ApiService } from 'src/api/api.service';
 
 export interface PemeliharaanGedung {
   id: number;
@@ -18,7 +20,21 @@ export interface PemeliharaanGedung {
 
 @Injectable()
 export class PemeliharaanGedungService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly httpService: ApiService,
+  ) {}
+
+  async getOpsiKota(params: OpsiCakupanDto) {
+    
+  }
+
+  async getOpsiSekre(params: OpsiCakupanDto) {
+
+  }
+
+  async getOpsiGedung(params: OpsiCakupanDto) {
+
+  }
 
   async getPemeliharaanGedung(params: PemeliharaanGedungDto) {
     const skip = params.page ? (params.page - 1) * params.per_page : 0;

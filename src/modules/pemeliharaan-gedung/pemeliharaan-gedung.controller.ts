@@ -13,6 +13,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SUCCESS_STATUS } from 'src/dto/request-response.dto';
 import { PemeliharaanGedungService } from './pemeliharaan-gedung.service';
 import {
+  OpsiCakupanDto,
   CreatePemeliharaanGedungDto,
   PemeliharaanGedungDto,
   UpdatePemeliharaanGedungDto,
@@ -25,6 +26,72 @@ export class PemeliharaanGedungController {
   constructor(
     private readonly pemeliharaanGedungService: PemeliharaanGedungService,
   ) {}
+
+  @Get('inspeksi-unit/opsi-kota')
+  @ApiOperation({
+    summary: 'Get Opsi Kota',
+    description: 'Get Opsi Kota using params',
+  })
+  async getOpsiKota(@Query() params: OpsiCakupanDto) {
+    try {
+      const data =
+        await this.pemeliharaanGedungService.getOpsiKota(params);
+      return {
+        data: data,
+        _meta: {
+          code: HttpStatus.CREATED,
+          status: SUCCESS_STATUS,
+          message: 'success get opsi kota',
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('inspeksi-unit/opsi-sekre')
+  @ApiOperation({
+    summary: 'Get Opsi Sekre',
+    description: 'Get Opsi Sekre using params',
+  })
+  async getOpsiSekre(@Query() params: OpsiCakupanDto) {
+    try {
+      const data =
+        await this.pemeliharaanGedungService.getOpsiSekre(params);
+      return {
+        data: data,
+        _meta: {
+          code: HttpStatus.CREATED,
+          status: SUCCESS_STATUS,
+          message: 'success get opsi sekre',
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('inspeksi-unit/opsi-gedung')
+  @ApiOperation({
+    summary: 'Get Opsi Gedung',
+    description: 'Get Opsi Gedung using params',
+  })
+  async getOpsiGedung(@Query() params: OpsiCakupanDto) {
+    try {
+      const data =
+        await this.pemeliharaanGedungService.getOpsiGedung(params);
+      return {
+        data: data,
+        _meta: {
+          code: HttpStatus.CREATED,
+          status: SUCCESS_STATUS,
+          message: 'success get opsi gedung',
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 
   @Get()
   @ApiOperation({
