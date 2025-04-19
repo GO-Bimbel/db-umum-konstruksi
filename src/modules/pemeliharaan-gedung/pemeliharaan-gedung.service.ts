@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { DetailListGedungDto, ImageDetailDto } from 'src/dto/master-gedung-dto';
 import {
   CreatePemeliharaanGedungDto,
+  PemeliharaanGedungDetailDto,
   PemeliharaanGedungDto,
   UpdatePemeliharaanGedungDto,
 } from 'src/dto/pemeliharaan-gedung.dto';
@@ -44,6 +45,50 @@ export class PemeliharaanGedungService {
     return {
       total_data: total_data,
       data: data,
+    };
+  }
+
+  async getPemeliharaanGedungDetail(params: PemeliharaanGedungDetailDto) {
+    const now = new Date();
+    const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const periode = now.getDate() <= 14 ? 1 : 2;
+    const arrQuery = [];
+
+    if (params.gedung_id) {
+      arrQuery.push({
+        gedung_id: params.gedung_id,
+      });
+    }
+
+    if (params.bagian_gedung_detail_id) {
+      arrQuery.push({
+        bagian_gedung_detail_id: params.bagian_gedung_detail_id,
+      });
+    }
+
+    const [data, total_data] = await Promise.all([
+      this.prisma.pemeliharaan_gedung.findMany({
+        where: {
+          AND: arrQuery,
+          bulan: bulan,
+          periode: periode,
+        },
+        select: {
+          id: true,
+          image_url: true,
+          updated_by: true,
+        },
+      }),
+      this.prisma.pemeliharaan_gedung.count({
+        where: {
+          AND: arrQuery,
+        },
+      }),
+    ]);
+
+    return {
+      total_data: total_data,
+      data,
     };
   }
 

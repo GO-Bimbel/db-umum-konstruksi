@@ -14,6 +14,7 @@ import { SUCCESS_STATUS } from 'src/dto/request-response.dto';
 import { PemeliharaanGedungService } from './pemeliharaan-gedung.service';
 import {
   CreatePemeliharaanGedungDto,
+  PemeliharaanGedungDetailDto,
   PemeliharaanGedungDto,
   UpdatePemeliharaanGedungDto,
 } from 'src/dto/pemeliharaan-gedung.dto';
@@ -62,6 +63,42 @@ export class PemeliharaanGedungController {
     }
   }
 
+  @Get('detail')
+  @ApiOperation({
+    summary: 'Get Pemeliharaan Gedung Detail',
+    description: 'Get pemeliharaan gedung detail using query params',
+  })
+  async getPemeliharaanGedungDetail(@Query() params: PemeliharaanGedungDetailDto) {
+    try {
+      const { total_data, data } =
+        await this.pemeliharaanGedungService.getPemeliharaanGedungDetail(params);
+
+      const metadata = {
+        total_count: total_data,
+        page_count: params.is_all_data
+          ? 1
+          : Math.ceil(total_data / (params.per_page ?? 10)),
+        page: params.is_all_data ? 1 : params.page,
+        per_page: params.is_all_data ? total_data : params.per_page,
+        sort: params.sort,
+        order_by: params.order_by,
+        keyword: params.keyword,
+      };
+
+      return {
+        data: data,
+        metadata: metadata ? metadata : null,
+        _meta: {
+          code: HttpStatus.OK,
+          status: SUCCESS_STATUS,
+          message: 'success get pemeliharaan gedung detail',
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Get('komponen')
   @ApiOperation({
     summary: 'Get Komponen Gedung',
@@ -97,6 +134,7 @@ export class PemeliharaanGedungController {
       throw error;
     }
   }
+  
   @Get('komponen/detail')
   @ApiOperation({
     summary: 'Get Komponen Detail',
