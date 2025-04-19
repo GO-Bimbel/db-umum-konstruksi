@@ -191,6 +191,11 @@ export class PemeliharaanGedungService {
           id: true,
           image_url: true,
           updated_by: true,
+          bagian_gedung_detail: {
+            select: {
+              nama: true
+            }
+          }
         },
       }),
       this.prisma.pemeliharaan_gedung.count({
@@ -202,7 +207,14 @@ export class PemeliharaanGedungService {
 
     return {
       total_data: total_data,
-      data,
+      data: data.map((item)=>{
+        return {
+          id: item.id,
+          image_url: item.image_url,
+          updated_by: item.updated_by,
+          bagian_gedung_detail: item.bagian_gedung_detail?.nama ?? null
+        }
+      })
     };
   }
 
