@@ -13,7 +13,9 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SUCCESS_STATUS } from 'src/dto/request-response.dto';
 import { PemeliharaanGedungService } from './pemeliharaan-gedung.service';
 import {
+  OpsiCakupanDto,
   CreatePemeliharaanGedungDto,
+  PemeliharaanGedungDetailDto,
   PemeliharaanGedungDto,
   UpdatePemeliharaanGedungDto,
 } from 'src/dto/pemeliharaan-gedung.dto';
@@ -25,6 +27,72 @@ export class PemeliharaanGedungController {
   constructor(
     private readonly pemeliharaanGedungService: PemeliharaanGedungService,
   ) {}
+
+  @Get('inspeksi-unit/opsi-kota')
+  @ApiOperation({
+    summary: 'Get Opsi Kota',
+    description: 'Get Opsi Kota using params',
+  })
+  async getOpsiKota(@Query() params: OpsiCakupanDto) {
+    try {
+      const data =
+        await this.pemeliharaanGedungService.getOpsiKota(params);
+      return {
+        data: data,
+        _meta: {
+          code: HttpStatus.CREATED,
+          status: SUCCESS_STATUS,
+          message: 'success get opsi kota',
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('inspeksi-unit/opsi-sekre')
+  @ApiOperation({
+    summary: 'Get Opsi Sekre',
+    description: 'Get Opsi Sekre using params',
+  })
+  async getOpsiSekre(@Query() params: OpsiCakupanDto) {
+    try {
+      const data =
+        await this.pemeliharaanGedungService.getOpsiSekre(params);
+      return {
+        data: data,
+        _meta: {
+          code: HttpStatus.CREATED,
+          status: SUCCESS_STATUS,
+          message: 'success get opsi sekre',
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('inspeksi-unit/opsi-gedung')
+  @ApiOperation({
+    summary: 'Get Opsi Gedung',
+    description: 'Get Opsi Gedung using params',
+  })
+  async getOpsiGedung(@Query() params: OpsiCakupanDto) {
+    try {
+      const data =
+        await this.pemeliharaanGedungService.getOpsiGedung(params);
+      return {
+        data: data,
+        _meta: {
+          code: HttpStatus.CREATED,
+          status: SUCCESS_STATUS,
+          message: 'success get opsi gedung',
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 
   @Get()
   @ApiOperation({
@@ -55,6 +123,42 @@ export class PemeliharaanGedungController {
           code: HttpStatus.OK,
           status: SUCCESS_STATUS,
           message: 'success get Pemeliharaan Gedung',
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('detail')
+  @ApiOperation({
+    summary: 'Get Pemeliharaan Gedung Detail',
+    description: 'Get pemeliharaan gedung detail using query params',
+  })
+  async getPemeliharaanGedungDetail(@Query() params: PemeliharaanGedungDetailDto) {
+    try {
+      const { total_data, data } =
+        await this.pemeliharaanGedungService.getPemeliharaanGedungDetail(params);
+
+      const metadata = {
+        total_count: total_data,
+        page_count: params.is_all_data
+          ? 1
+          : Math.ceil(total_data / (params.per_page ?? 10)),
+        page: params.is_all_data ? 1 : params.page,
+        per_page: params.is_all_data ? total_data : params.per_page,
+        sort: params.sort,
+        order_by: params.order_by,
+        keyword: params.keyword,
+      };
+
+      return {
+        data: data,
+        metadata: metadata ? metadata : null,
+        _meta: {
+          code: HttpStatus.OK,
+          status: SUCCESS_STATUS,
+          message: 'success get pemeliharaan gedung detail',
         },
       };
     } catch (error) {
@@ -97,6 +201,7 @@ export class PemeliharaanGedungController {
       throw error;
     }
   }
+  
   @Get('komponen/detail')
   @ApiOperation({
     summary: 'Get Komponen Detail',

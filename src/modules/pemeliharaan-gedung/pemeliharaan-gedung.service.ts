@@ -2,12 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DetailListGedungDto, ImageDetailDto } from 'src/dto/master-gedung-dto';
 import {
+  OpsiCakupanDto,
   CreatePemeliharaanGedungDto,
+  PemeliharaanGedungDetailDto,
   PemeliharaanGedungDto,
   UpdatePemeliharaanGedungDto,
 } from 'src/dto/pemeliharaan-gedung.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CustomError } from 'src/utils/CustomError';
+import { ApiService } from 'src/api/api.service';
+import { identity } from 'rxjs';
 
 export interface PemeliharaanGedung {
   id: number;
@@ -18,7 +22,137 @@ export interface PemeliharaanGedung {
 
 @Injectable()
 export class PemeliharaanGedungService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly httpService: ApiService,
+    private readonly prisma: PrismaService,
+  ) {}
+
+  async getOpsiKota(params: OpsiCakupanDto) {
+    const respGoKaryawan = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/karyawan/detail/${params.nik}`,
+    );
+    const dataKaryawan = respGoKaryawan?.data ?? [];
+
+    const respGoKota = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/kota-gedung-ids?kota_ids=${dataKaryawan?.kota_ids}`,
+    );
+    const dataKota = respGoKota?.data ?? [];
+
+    const now = new Date();
+    const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const periode = now.getDate() <= 14 ? 1 : 2;
+
+    const dataPemeliharaanGedung =
+      await this.prisma.pemeliharaan_gedung.findMany({
+        where: {
+          gedung_id: {
+            in: dataKota.flatMap((item) => item.gedung_ids) ?? [],
+          },
+          periode: periode,
+          bulan: bulan
+        },
+      });
+
+    const pemeliharaanGedungSet = new Set(
+      dataPemeliharaanGedung.map((g) => g.gedung_id),
+    );
+
+    return dataKota.map((item) => {
+      const matchDataGedung = item.gedung_ids.some((id) =>
+        pemeliharaanGedungSet.has(id),
+      );
+
+      return {
+        id: item.c_id_kota,
+        nama: item.c_kota,
+        is_input: matchDataGedung,
+      };
+    });
+  }
+
+  async getOpsiSekre(params: OpsiCakupanDto) {
+    const respGoKaryawan = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/karyawan/detail/${params.nik}`,
+    );
+    const dataKaryawan = respGoKaryawan?.data ?? [];
+
+    const respGoSekre = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/sekretariat/gedung-list-per-sekre?list_sekre_ids=${dataKaryawan.sekre_ids}`,
+    );
+    const dataSekre = respGoSekre?.data ?? [];
+
+    const now = new Date();
+    const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const periode = now.getDate() <= 14 ? 1 : 2;
+
+    const dataPemeliharaanGedung =
+      await this.prisma.pemeliharaan_gedung.findMany({
+        where: {
+          gedung_id: {
+            in: dataSekre.flatMap((item) => item.gedung_ids) ?? [],
+          },
+          periode: periode,
+          bulan: bulan
+        },
+      });
+
+    const pemeliharaanGedungSet = new Set(
+      dataPemeliharaanGedung.map((g) => g.gedung_id),
+    );
+
+    return dataSekre.map((item) => {
+      const matchDataGedung = item.gedung_ids.some((id) =>
+        pemeliharaanGedungSet.has(id),
+      );
+
+      return {
+        id: item.id,
+        nama: item.nama ?? null,
+        is_input: matchDataGedung,
+      };
+    });
+  }
+
+  async getOpsiGedung(params: OpsiCakupanDto) {
+    const respGoKaryawan = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/karyawan/detail/${params.nik}`,
+    );
+    const dataKaryawan = respGoKaryawan?.data ?? [];
+
+    const respGoGedung = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/gedung?ids=${dataKaryawan.gedung_ids}`,
+    );
+    const dataGedung = respGoGedung?.data ?? [];
+
+    const now = new Date();
+    const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const periode = now.getDate() <= 14 ? 1 : 2;
+    
+    const dataPemeliharaanGedung =
+      await this.prisma.pemeliharaan_gedung.findMany({
+        where: {
+          gedung_id: {
+            in: dataGedung.map((item) => item.c_id_gedung) ?? [],
+          },
+          periode: periode,
+          bulan: bulan
+        },
+      });
+
+
+    const pemeliharaanGedungIds = dataPemeliharaanGedung.map((item) => item.gedung_id);
+
+    return dataGedung.map((item) => {
+      const matchDataGedung = pemeliharaanGedungIds.includes(item.c_id_gedung);
+
+      return {
+        id: item.c_id_gedung,
+        nama: item.c_nama_gedung ?? null,
+        is_input: matchDataGedung,
+      };
+    });
+
+  }
 
   async getPemeliharaanGedung(params: PemeliharaanGedungDto) {
     const skip = params.page ? (params.page - 1) * params.per_page : 0;
@@ -47,6 +181,62 @@ export class PemeliharaanGedungService {
     };
   }
 
+  async getPemeliharaanGedungDetail(params: PemeliharaanGedungDetailDto) {
+    const now = new Date();
+    const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const periode = now.getDate() <= 14 ? 1 : 2;
+    const arrQuery = [];
+
+    if (params.gedung_id) {
+      arrQuery.push({
+        gedung_id: params.gedung_id,
+      });
+    }
+
+    if (params.bagian_gedung_detail_id) {
+      arrQuery.push({
+        bagian_gedung_detail_id: params.bagian_gedung_detail_id,
+      });
+    }
+
+    const [data, total_data] = await Promise.all([
+      this.prisma.pemeliharaan_gedung.findMany({
+        where: {
+          AND: arrQuery,
+          bulan: bulan,
+          periode: periode,
+        },
+        select: {
+          id: true,
+          image_url: true,
+          updated_by: true,
+          bagian_gedung_detail: {
+            select: {
+              nama: true
+            }
+          }
+        },
+      }),
+      this.prisma.pemeliharaan_gedung.count({
+        where: {
+          AND: arrQuery,
+        },
+      }),
+    ]);
+
+    return {
+      total_data: total_data,
+      data: data.map((item)=>{
+        return {
+          id: item.id,
+          image_url: item.image_url,
+          updated_by: item.updated_by,
+          bagian_gedung_detail: item.bagian_gedung_detail?.nama ?? null
+        }
+      })
+    };
+  }
+
   async createPemeliharaanGedung(dto: CreatePemeliharaanGedungDto) {
     const now = new Date();
     const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -67,15 +257,25 @@ export class PemeliharaanGedungService {
 
     const bagianDetail = await this.prisma.bagian_gedung_detail.findUnique({
       where: { id: bagian_gedung_detail_id },
-      select: { maks_foto: true },
+      select: {
+        nama: true,
+        maks_foto: true,
+      },
     });
 
     const totalUploads = existingCount + dto.data_pemeliharaan.length;
+    if (existingCount == bagianDetail.maks_foto) {
+      throw new CustomError(
+        `Sudah ada (${existingCount}) dari maksimal (${bagianDetail.maks_foto}) data foto tersimpan untuk ${bagianDetail.nama}. ` +
+          `Anda tidak bisa mengupload foto lagi di periode ini`,
+        400,
+      );
+    }
     if (totalUploads > bagianDetail.maks_foto) {
       const remaining = bagianDetail.maks_foto - existingCount;
       throw new CustomError(
-        `Sudah ada (${existingCount}) dari maksimal (${bagianDetail.maks_foto}) data foto tersimpan untuk bagian gedung detail ID ${bagian_gedung_detail_id}. ` +
-          `Kamu hanya boleh upload ${remaining < 0 ? 0 : remaining} foto lagi di periode ini.`,
+        `Sudah ada (${existingCount}) dari maksimal (${bagianDetail.maks_foto}) data foto tersimpan untuk ${bagianDetail.nama}. ` +
+          `Anda hanya boleh upload ${remaining < 0 ? 0 : remaining} foto lagi di periode ini.`,
         400,
       );
     }
@@ -157,11 +357,10 @@ export class PemeliharaanGedungService {
       `,
       this.prisma.$queryRaw<{ count: number }[]>`
           SELECT 
-              COUNT(*)::int
+          COUNT(DISTINCT bgd.id)::int AS count
           FROM bagian_gedung_detail bgd
           JOIN bagian_gedung_komponen bgk ON bgk.id = bgd.bagian_gedung_komponen_id 
           WHERE bgk.bagian_gedung_id = ${params.bagian_gedung_id}
-          GROUP BY bgk.id, bgd.id, bgk.nama, bgd.nama
       `,
     ]);
 

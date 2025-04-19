@@ -175,13 +175,13 @@ autoscaling:
   minReplicas: 1
   ## @param autoscaling.maxReplicas Maximum number of replicas
   ##
-  maxReplicas: 9
+  maxReplicas: 24
   ## @param autoscaling.targetCPU Target CPU utilization percentage
   ##
-  targetCPU: 50
+  targetCPU: 30
   ## @param autoscaling.targetMemory Target Memory utilization percentage
   ##
-  targetMemory: 50
+  targetMemory: 30
   ## HPA Scaling Behavior
   ## ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior
   ##
@@ -360,7 +360,6 @@ container:
       port: http
     initialDelaySeconds: 1
     periodSeconds: 10
-    timeoutSeconds: 300
   ## @param readinessProbe.enabled Enable readinessProbe
   ##
   readinessProbe:
@@ -370,7 +369,6 @@ container:
       port: http
     initialDelaySeconds: 1
     periodSeconds: 10
-    timeoutSeconds: 300
   ##
   startupProbe:
     failureThreshold: 3
@@ -379,7 +377,6 @@ container:
       port: http
     initialDelaySeconds: 1
     periodSeconds: 10
-    timeoutSeconds: 300
 ## Pod Disruption Budget configuration
 ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
 ##
@@ -389,10 +386,10 @@ podDisruptionBudget:
   create: true
   ## @param pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
   ##
-  # minAvailable: 1
+  minAvailable: 1
   ## @param pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable
   ##
-  maxUnavailable: 1
+  # maxUnavailable: 1
 ## @params.verticalPodAutoscaler VerticalPodAutoscaling configuration
 ## ref: https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/README.md
 ##
