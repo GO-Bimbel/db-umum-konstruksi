@@ -49,6 +49,20 @@ export class PemeliharaanGedungDto extends PaginationDto {
   kondisi?: kondisi_enum;
 }
 
+export class PemeliharaanGedungDetailDto extends PaginationDto {
+  @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  gedung_id?: number;
+
+  @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  bagian_gedung_detail_id?: number;
+}
+
 export class UpdatePemeliharaanGedungDto {
   @ApiProperty({ required: true, example: 1 })
   @Type(() => Number)
