@@ -38,12 +38,18 @@ export class PemeliharaanGedungService {
     );
     const dataKota = respGoKota?.data ?? [];
 
+    const now = new Date();
+    const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const periode = now.getDate() <= 14 ? 1 : 2;
+
     const dataPemeliharaanGedung =
       await this.prisma.pemeliharaan_gedung.findMany({
         where: {
           gedung_id: {
             in: dataKota.flatMap((item) => item.gedung_ids) ?? [],
           },
+          periode: periode,
+          bulan: bulan
         },
       });
 
@@ -75,12 +81,18 @@ export class PemeliharaanGedungService {
     );
     const dataSekre = respGoSekre?.data ?? [];
 
+    const now = new Date();
+    const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const periode = now.getDate() <= 14 ? 1 : 2;
+
     const dataPemeliharaanGedung =
       await this.prisma.pemeliharaan_gedung.findMany({
         where: {
           gedung_id: {
             in: dataSekre.flatMap((item) => item.gedung_ids) ?? [],
           },
+          periode: periode,
+          bulan: bulan
         },
       });
 
@@ -111,12 +123,19 @@ export class PemeliharaanGedungService {
       `${process.env.SVC_DB_GO}/api/v1/gedung?ids=${dataKaryawan.gedung_ids}`,
     );
     const dataGedung = respGoGedung?.data ?? [];
+
+    const now = new Date();
+    const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const periode = now.getDate() <= 14 ? 1 : 2;
+    
     const dataPemeliharaanGedung =
       await this.prisma.pemeliharaan_gedung.findMany({
         where: {
           gedung_id: {
             in: dataGedung.map((item) => item.c_id_gedung) ?? [],
           },
+          periode: periode,
+          bulan: bulan
         },
       });
 
