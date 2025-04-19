@@ -10,7 +10,14 @@ export class DetailGedungDto extends PaginationDto {
   @IsInt()
   @Min(1)
   @IsOptional()
-  bagian_gedung_komponen_id: number;
+  bagian_gedung_komponen_id?: number;
+
+  @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  gedung_id?: number;
 }
 export class DetailListGedungDto extends PaginationDto {
   @ApiProperty({ required: true, example: 1 })
