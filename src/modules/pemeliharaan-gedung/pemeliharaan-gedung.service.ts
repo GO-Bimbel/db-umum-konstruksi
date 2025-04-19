@@ -11,6 +11,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CustomError } from 'src/utils/CustomError';
 import { ApiService } from 'src/api/api.service';
+import { identity } from 'rxjs';
 
 export interface PemeliharaanGedung {
   id: number;
@@ -23,17 +24,114 @@ export interface PemeliharaanGedung {
 export class PemeliharaanGedungService {
   constructor(
     private readonly httpService: ApiService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async getOpsiKota(params: OpsiCakupanDto) {
-    
+    const respGoKaryawan = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/karyawan/detail/${params.nik}`,
+    );
+    const dataKaryawan = respGoKaryawan?.data ?? [];
+
+    const respGoKota = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/kota-gedung-ids?kota_ids=${dataKaryawan?.kota_ids}`,
+    );
+    const dataKota = respGoKota?.data ?? [];
+
+    const dataPemeliharaanGedung =
+      await this.prisma.pemeliharaan_gedung.findMany({
+        where: {
+          gedung_id: {
+            in: dataKota.flatMap((item) => item.gedung_ids) ?? [],
+          },
+        },
+      });
+
+    const pemeliharaanGedungSet = new Set(
+      dataPemeliharaanGedung.map((g) => g.gedung_id),
+    );
+
+    return dataKota.map((item) => {
+      const matchDataGedung = item.gedung_ids.some((id) =>
+        pemeliharaanGedungSet.has(id),
+      );
+
+      return {
+        id: item.c_id_kota,
+        nama: item.c_kota,
+        is_input: matchDataGedung,
+      };
+    });
   }
 
   async getOpsiSekre(params: OpsiCakupanDto) {
+    const respGoKaryawan = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/karyawan/detail/${params.nik}`,
+    );
+    const dataKaryawan = respGoKaryawan?.data ?? [];
 
+    const respGoSekre = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/sekretariat/gedung-list-per-sekre?list_sekre_ids=${dataKaryawan.sekre_ids}`,
+    );
+    const dataSekre = respGoSekre?.data ?? [];
+
+    const dataPemeliharaanGedung =
+      await this.prisma.pemeliharaan_gedung.findMany({
+        where: {
+          gedung_id: {
+            in: dataSekre.flatMap((item) => item.gedung_ids) ?? [],
+          },
+        },
+      });
+
+    const pemeliharaanGedungSet = new Set(
+      dataPemeliharaanGedung.map((g) => g.gedung_id),
+    );
+
+    return dataSekre.map((item) => {
+      const matchDataGedung = item.gedung_ids.some((id) =>
+        pemeliharaanGedungSet.has(id),
+      );
+
+      return {
+        id: item.id,
+        nama: item.nama ?? null,
+        is_input: matchDataGedung,
+      };
+    });
   }
 
   async getOpsiGedung(params: OpsiCakupanDto) {
+    const respGoKaryawan = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/karyawan/detail/${params.nik}`,
+    );
+    const dataKaryawan = respGoKaryawan?.data ?? [];
+
+    const respGoGedung = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/gedung?ids=${dataKaryawan.gedung_ids}`,
+    );
+    const dataGedung = respGoGedung?.data ?? [];
+    const dataPemeliharaanGedung =
+      await this.prisma.pemeliharaan_gedung.findMany({
+        where: {
+          gedung_id: {
+            in: dataGedung.map((item) => item.c_id_gedung) ?? [],
+          },
+        },
+      });
+
+
+    const pemeliharaanGedungIds = dataPemeliharaanGedung.map((item) => item.gedung_id);
+
+    return dataGedung.map((item) => {
+      const matchDataGedung = pemeliharaanGedungIds.includes(item.c_id_gedung);
+
+      return {
+        id: item.c_id_gedung,
+        nama: item.c_nama_gedung ?? null,
+        is_input: matchDataGedung,
+      };
+    });
 
   }
 

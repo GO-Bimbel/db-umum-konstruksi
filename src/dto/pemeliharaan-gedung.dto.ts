@@ -18,10 +18,10 @@ export class OpsiCakupanDto {
   @IsString()
   nik: string;
 
-  @ApiProperty({ required: true, example: 1 })
-  @IsNotEmpty()
+  @ApiProperty({ required: false, example: 1 })
+  @IsOptional()
   @IsInt()
-  id: number;
+  id?: number;
 }
 
 export class PemeliharaanGedungDto extends PaginationDto {
