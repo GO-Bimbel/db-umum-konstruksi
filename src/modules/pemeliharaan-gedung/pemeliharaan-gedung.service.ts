@@ -32,11 +32,13 @@ export class PemeliharaanGedungService {
       `${process.env.SVC_DB_GO}/api/v1/karyawan/detail/${params.nik}`,
     );
     const dataKaryawan = respGoKaryawan?.data ?? [];
+    const kotaIds = dataKaryawan.kota_ids.split(',').map(Number);
 
     const respGoKota = await this.httpService.get(
-      `${process.env.SVC_DB_GO}/api/v1/kota-gedung-ids?kota_ids=${dataKaryawan?.kota_ids}`,
+      `${process.env.SVC_DB_GO}/api/v1/kota-gedung-ids?cabang_id=${params.id}`,
     );
     const dataKota = respGoKota?.data ?? [];
+    const dataKotaFilter = dataKota.filter((kota)=>kotaIds.includes(kota.c_id_kota));
 
     const now = new Date();
     const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -46,7 +48,7 @@ export class PemeliharaanGedungService {
       await this.prisma.pemeliharaan_gedung.findMany({
         where: {
           gedung_id: {
-            in: dataKota.flatMap((item) => item.gedung_ids) ?? [],
+            in: dataKotaFilter.flatMap((item) => item.gedung_ids) ?? [],
           },
           periode: periode,
           bulan: bulan
@@ -57,7 +59,7 @@ export class PemeliharaanGedungService {
       dataPemeliharaanGedung.map((g) => g.gedung_id),
     );
 
-    return dataKota.map((item) => {
+    return dataKotaFilter.map((item) => {
       const matchDataGedung = item.gedung_ids.some((id) =>
         pemeliharaanGedungSet.has(id),
       );
@@ -75,11 +77,13 @@ export class PemeliharaanGedungService {
       `${process.env.SVC_DB_GO}/api/v1/karyawan/detail/${params.nik}`,
     );
     const dataKaryawan = respGoKaryawan?.data ?? [];
+    const sekreIds = dataKaryawan.sekre_ids.split(',').map(Number);
 
     const respGoSekre = await this.httpService.get(
-      `${process.env.SVC_DB_GO}/api/v1/sekretariat/gedung-list-per-sekre?list_sekre_ids=${dataKaryawan.sekre_ids}`,
+      `${process.env.SVC_DB_GO}/api/v1/sekretariat/gedung-list-per-sekre?kota_id=${params.id}`,
     );
     const dataSekre = respGoSekre?.data ?? [];
+    const dataSekreFilter = dataSekre.filter((sekre)=>sekreIds.includes(sekre.id));
 
     const now = new Date();
     const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -89,7 +93,7 @@ export class PemeliharaanGedungService {
       await this.prisma.pemeliharaan_gedung.findMany({
         where: {
           gedung_id: {
-            in: dataSekre.flatMap((item) => item.gedung_ids) ?? [],
+            in: dataSekreFilter.flatMap((item) => item.gedung_ids) ?? [],
           },
           periode: periode,
           bulan: bulan
@@ -100,7 +104,7 @@ export class PemeliharaanGedungService {
       dataPemeliharaanGedung.map((g) => g.gedung_id),
     );
 
-    return dataSekre.map((item) => {
+    return dataSekreFilter.map((item) => {
       const matchDataGedung = item.gedung_ids.some((id) =>
         pemeliharaanGedungSet.has(id),
       );
@@ -114,15 +118,22 @@ export class PemeliharaanGedungService {
   }
 
   async getOpsiGedung(params: OpsiCakupanDto) {
-    const respGoKaryawan = await this.httpService.get(
-      `${process.env.SVC_DB_GO}/api/v1/karyawan/detail/${params.nik}`,
-    );
-    const dataKaryawan = respGoKaryawan?.data ?? [];
+    let gedungIds = [];
+    if (params.ids) {
+      gedungIds = params.ids.split(',').map(Number);
+    } else {
+      const respGoKaryawan = await this.httpService.get(
+        `${process.env.SVC_DB_GO}/api/v1/karyawan/detail/${params.nik}`,
+      );
+      const dataKaryawan = respGoKaryawan?.data ?? [];
+      gedungIds = dataKaryawan.gedung_ids.split(',').map(Number);
+    }
 
     const respGoGedung = await this.httpService.get(
-      `${process.env.SVC_DB_GO}/api/v1/gedung?ids=${dataKaryawan.gedung_ids}`,
+      `${process.env.SVC_DB_GO}/api/v1/gedung/gedung-by-sekretariat?sekretariat_ids=${params.id}`,
     );
     const dataGedung = respGoGedung?.data ?? [];
+    const dataGedungFilter = dataGedung.filter((gedung)=>gedungIds.includes(gedung.c_id_gedung));
 
     const now = new Date();
     const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -132,7 +143,7 @@ export class PemeliharaanGedungService {
       await this.prisma.pemeliharaan_gedung.findMany({
         where: {
           gedung_id: {
-            in: dataGedung.map((item) => item.c_id_gedung) ?? [],
+            in: dataGedungFilter.map((item) => item.c_id_gedung) ?? [],
           },
           periode: periode,
           bulan: bulan
@@ -142,7 +153,7 @@ export class PemeliharaanGedungService {
 
     const pemeliharaanGedungIds = dataPemeliharaanGedung.map((item) => item.gedung_id);
 
-    return dataGedung.map((item) => {
+    return dataGedungFilter.map((item) => {
       const matchDataGedung = pemeliharaanGedungIds.includes(item.c_id_gedung);
 
       return {
