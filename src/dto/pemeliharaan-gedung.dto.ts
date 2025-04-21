@@ -14,11 +14,13 @@ import { kondisi_enum } from '@prisma/client';
 
 export class OpsiCakupanDto {
   @ApiProperty({ required: true, example: '2020066002' })
+  @Type(() => String)
   @IsNotEmpty()
   @IsString()
   nik: string;
 
   @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
   @IsOptional()
   @IsInt()
   id?: number;
