@@ -24,6 +24,12 @@ export class OpsiCakupanDto {
   @IsOptional()
   @IsInt()
   id?: number;
+
+  @ApiProperty({ required: false, example: '1,2' })
+  @Type(() => String)
+  @IsOptional()
+  @IsString()
+  ids?: string;
 }
 
 export class PemeliharaanGedungDto extends PaginationDto {
