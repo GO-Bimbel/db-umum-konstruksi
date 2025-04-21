@@ -220,17 +220,26 @@ export class PemeliharaanGedungService {
       this.prisma.pemeliharaan_gedung.count({
         where: {
           AND: arrQuery,
+          bulan: bulan,
+          periode: periode,
         },
       }),
     ]);
 
+    const nik = data.map((item) => item.updated_by).join(',')
+    const respGoKaryawan = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/karyawan/listNik?nik=${nik}`,
+    );
+    const dataKaryawan = respGoKaryawan?.data ?? [];
+
     return {
       total_data: total_data,
       data: data.map((item)=>{
+        const findKaryawan = dataKaryawan.find((karyawan) => karyawan.c_nik === item.updated_by)
         return {
           id: item.id,
-          image_url: item.image_url,
-          updated_by: item.updated_by,
+          image_url: item.image_url ?? null,
+          updated_by: findKaryawan?.c_nama_lengkap ?? null,
           bagian_gedung_detail: item.bagian_gedung_detail?.nama ?? null
         }
       })
