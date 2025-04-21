@@ -12,6 +12,26 @@ import {
 import { PaginationDto } from './pagination-dto';
 import { kondisi_enum } from '@prisma/client';
 
+export class OpsiCakupanDto {
+  @ApiProperty({ required: true, example: '2020066002' })
+  @Type(() => String)
+  @IsNotEmpty()
+  @IsString()
+  nik: string;
+
+  @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  id?: number;
+
+  @ApiProperty({ required: false, example: '1,2' })
+  @Type(() => String)
+  @IsOptional()
+  @IsString()
+  ids?: string;
+}
+
 export class PemeliharaanGedungDto extends PaginationDto {
   @ApiProperty({ required: false, example: 1 })
   @Type(() => Number)
@@ -35,6 +55,20 @@ export class PemeliharaanGedungDto extends PaginationDto {
   @IsOptional()
   @IsEnum(kondisi_enum)
   kondisi?: kondisi_enum;
+}
+
+export class PemeliharaanGedungDetailDto extends PaginationDto {
+  @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  gedung_id?: number;
+
+  @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  bagian_gedung_detail_id?: number;
 }
 
 export class UpdatePemeliharaanGedungDto {
