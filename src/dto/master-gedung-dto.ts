@@ -3,7 +3,14 @@ import { PaginationDto } from './pagination-dto';
 import { IsInt, IsOptional, Min, IsString, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class BagianGedungDto extends PaginationDto {}
+export class BagianGedungDto extends PaginationDto {
+  @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  gedung_id?: number;
+}
 export class DetailGedungDto extends PaginationDto {
   @ApiProperty({ required: false, example: 1 })
   @Type(() => Number)
@@ -59,4 +66,11 @@ export class KomponenGedungDto extends PaginationDto {
   @Min(1)
   @IsOptional()
   bagian_gedung_id: number;
+
+  @ApiProperty({ required: false, example: 1 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  gedung_id?: number;
 }
