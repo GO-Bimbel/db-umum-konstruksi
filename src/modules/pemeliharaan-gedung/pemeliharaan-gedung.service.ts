@@ -119,18 +119,21 @@ export class PemeliharaanGedungService {
 
   async getOpsiGedung(params: OpsiCakupanDto) {
     let gedungIds = [];
+    let urlGedung;
     if (params.ids) {
       gedungIds = params.ids.split(',').map(Number);
+      urlGedung = `${process.env.SVC_DB_GO}/api/v1/gedung/gedung-by-kota-cabang?gedung_ids=${params.ids}`;
     } else {
       const respGoKaryawan = await this.httpService.get(
         `${process.env.SVC_DB_GO}/api/v1/karyawan/detail/${params.nik}`,
       );
       const dataKaryawan = respGoKaryawan?.data ?? [];
       gedungIds = dataKaryawan.gedung_ids.split(',').map(Number);
+      urlGedung = `${process.env.SVC_DB_GO}/api/v1/gedung/gedung-by-sekretariat?sekretariat_ids=${params.id}`;
     }
 
     const respGoGedung = await this.httpService.get(
-      `${process.env.SVC_DB_GO}/api/v1/gedung/gedung-by-sekretariat?sekretariat_ids=${params.id}`,
+      urlGedung,
     );
     const dataGedung = respGoGedung?.data ?? [];
     const dataGedungFilter = dataGedung.filter((gedung)=>gedungIds.includes(gedung.c_id_gedung));
