@@ -280,6 +280,8 @@ container:
     value: vault:secrets/data/config/db_url#DB_UMUM_KONSTRUKSI
   - name: PORT
     value: "3220"
+  - name: SVC_DB_GO
+    value: vault:secrets/data/config/service_url#SVC_DB_GO
 
   command: ['sh', '-c', 'echo $DATABASE_URL > /dev/null 2>&1 && node dist/main']
 
