@@ -38,7 +38,9 @@ export class PemeliharaanGedungService {
       `${process.env.SVC_DB_GO}/api/v1/kota-gedung-ids?cabang_id=${params.id}`,
     );
     const dataKota = respGoKota?.data ?? [];
-    const dataKotaFilter = dataKota.filter((kota)=>kotaIds.includes(kota.c_id_kota));
+    const dataKotaFilter = dataKota.filter((kota) =>
+      kotaIds.includes(kota.c_id_kota),
+    );
 
     const now = new Date();
     const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -51,7 +53,7 @@ export class PemeliharaanGedungService {
             in: dataKotaFilter.flatMap((item) => item.gedung_ids) ?? [],
           },
           periode: periode,
-          bulan: bulan
+          bulan: bulan,
         },
       });
 
@@ -83,7 +85,9 @@ export class PemeliharaanGedungService {
       `${process.env.SVC_DB_GO}/api/v1/sekretariat/gedung-list-per-sekre?kota_id=${params.id}`,
     );
     const dataSekre = respGoSekre?.data ?? [];
-    const dataSekreFilter = dataSekre.filter((sekre)=>sekreIds.includes(sekre.id));
+    const dataSekreFilter = dataSekre.filter((sekre) =>
+      sekreIds.includes(sekre.id),
+    );
 
     const now = new Date();
     const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -96,7 +100,7 @@ export class PemeliharaanGedungService {
             in: dataSekreFilter.flatMap((item) => item.gedung_ids) ?? [],
           },
           periode: periode,
-          bulan: bulan
+          bulan: bulan,
         },
       });
 
@@ -132,16 +136,16 @@ export class PemeliharaanGedungService {
       urlGedung = `${process.env.SVC_DB_GO}/api/v1/gedung/gedung-by-sekretariat?sekretariat_ids=${params.id}`;
     }
 
-    const respGoGedung = await this.httpService.get(
-      urlGedung,
-    );
+    const respGoGedung = await this.httpService.get(urlGedung);
     const dataGedung = respGoGedung?.data ?? [];
-    const dataGedungFilter = dataGedung.filter((gedung)=>gedungIds.includes(gedung.c_id_gedung));
+    const dataGedungFilter = dataGedung.filter((gedung) =>
+      gedungIds.includes(gedung.c_id_gedung),
+    );
 
     const now = new Date();
     const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const periode = now.getDate() <= 14 ? 1 : 2;
-    
+
     const dataPemeliharaanGedung =
       await this.prisma.pemeliharaan_gedung.findMany({
         where: {
@@ -149,12 +153,13 @@ export class PemeliharaanGedungService {
             in: dataGedungFilter.map((item) => item.c_id_gedung) ?? [],
           },
           periode: periode,
-          bulan: bulan
+          bulan: bulan,
         },
       });
 
-
-    const pemeliharaanGedungIds = dataPemeliharaanGedung.map((item) => item.gedung_id);
+    const pemeliharaanGedungIds = dataPemeliharaanGedung.map(
+      (item) => item.gedung_id,
+    );
 
     return dataGedungFilter.map((item) => {
       const matchDataGedung = pemeliharaanGedungIds.includes(item.c_id_gedung);
@@ -165,7 +170,6 @@ export class PemeliharaanGedungService {
         is_input: matchDataGedung,
       };
     });
-
   }
 
   async getPemeliharaanGedung(params: PemeliharaanGedungDto) {
@@ -226,9 +230,9 @@ export class PemeliharaanGedungService {
           updated_by: true,
           bagian_gedung_detail: {
             select: {
-              nama: true
-            }
-          }
+              nama: true,
+            },
+          },
         },
       }),
       this.prisma.pemeliharaan_gedung.count({
@@ -240,7 +244,7 @@ export class PemeliharaanGedungService {
       }),
     ]);
 
-    const nik = data.map((item) => item.updated_by).join(',')
+    const nik = data.map((item) => item.updated_by).join(',');
     const respGoKaryawan = await this.httpService.get(
       `${process.env.SVC_DB_GO}/api/v1/karyawan/listNik?nik=${nik}`,
     );
@@ -248,15 +252,17 @@ export class PemeliharaanGedungService {
 
     return {
       total_data: total_data,
-      data: data.map((item)=>{
-        const findKaryawan = dataKaryawan.find((karyawan) => karyawan.c_nik === item.updated_by)
+      data: data.map((item) => {
+        const findKaryawan = dataKaryawan.find(
+          (karyawan) => karyawan.c_nik === item.updated_by,
+        );
         return {
           id: item.id,
           image_url: item.image_url ?? null,
           updated_by: findKaryawan?.c_nama_lengkap ?? null,
-          bagian_gedung_detail: item.bagian_gedung_detail?.nama ?? null
-        }
-      })
+          bagian_gedung_detail: item.bagian_gedung_detail?.nama ?? null,
+        };
+      }),
     };
   }
 
@@ -409,6 +415,7 @@ export class PemeliharaanGedungService {
           catatan: true,
           image_url: true,
           updated_at: true,
+          updated_by: true,
         },
         skip: params.is_all_data ? undefined : skip,
         take: params.is_all_data ? undefined : params.per_page,
@@ -418,9 +425,32 @@ export class PemeliharaanGedungService {
       }),
     ]);
 
+    if (data.length === 0) {
+      return {
+        total_data: 0,
+        data: [],
+      };
+    }
+
+    const nikArrStr = data.map((item) => item.updated_by).join(',');
+    const respGoKaryawan = await this.httpService.get(
+      `${process.env.SVC_DB_GO}/api/v1/karyawan/listNik?nik=${nikArrStr}`,
+    );
+    const dataKaryawanArr = respGoKaryawan?.data ?? [];
+
     return {
       total_data: total_data,
-      data,
+      data: data.map((item) => {
+        const dataKaryawan = dataKaryawanArr.find(
+          (karyawan) => karyawan.c_nik === item.updated_by,
+        );
+        return {
+          ...item,
+          petugas_upload: dataKaryawan
+            ? `${dataKaryawan.c_nama_lengkap} - ${dataKaryawan.t_jabatan_posisi?.c_jabatan_posisi ?? ''}`
+            : null,
+        };
+      }),
     };
   }
 }
